@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Router from './config/Router'
+import Router from './config/Router.jsx'
 
 function App() {
 

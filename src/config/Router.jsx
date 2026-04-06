@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
-import Signup from '../pages/Signup'
+import Signup from '../pages/SIgnup'
 import Login from "../pages/Login"
 import Dashboard from '../pages/Dashboard'
 import Sidebar from '../components/Sidebar'

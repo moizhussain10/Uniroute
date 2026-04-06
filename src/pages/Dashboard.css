@@ -1,0 +1,73 @@
+/* Sidebar */
+.sidebar {
+  min-width: 250px;
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar-link {
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+.logout-btn {
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.logout-btn:hover {
+  background: #ffc107;
+  color: #000;
+}
+
+/* Responsive Sidebar */
+@media (max-width: 768px) {
+  .sidebar {
+    min-width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sidebar ul {
+    flex-direction: row;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .sidebar-link {
+    margin: 0 8px;
+  }
+}
+
+/* Cards */
+.card {
+  border-radius: 12px;
+  background-color: #ffffff;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Dashboard container */
+.dashboard-container {
+  background: linear-gradient(135deg, #eef2ff, #dbeafe);
+}

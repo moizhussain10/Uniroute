@@ -1,0 +1,109 @@
+/* Intro Step Cards */
+.step-card {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: 0.3s;
+}
+
+.step-card:hover {
+  background: rgba(0, 243, 255, 0.05);
+  border-color: rgba(0, 243, 255, 0.2);
+}
+
+.step-icon {
+  width: 35px;
+  height: 35px;
+  background: #00f3ff;
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  font-weight: 800;
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+}
+
+.neon-circle-icon {
+  width: 50px;
+  height: 50px;
+  border: 2px solid #00f3ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+}
+
+/* Time input styling fix for dark theme */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+.location-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px dashed rgba(0, 243, 255, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+}
+
+.location-box:hover {
+    background: rgba(0, 243, 255, 0.05);
+    border-color: #00f3ff;
+}
+
+.location-box.active {
+    border: 2px solid #00f3ff;
+    background: rgba(0, 243, 255, 0.1);
+}
+
+.location-box.dest.active {
+    border-color: #ff4b2b;
+}
+
+.location-box .icon {
+    font-size: 2rem;
+    margin-right: 15px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.location-box.active .icon { color: #00f3ff; }
+
+.location-box h6 { color: white; margin: 0; }
+
+.location-box p { 
+    color: rgba(255, 255, 255, 0.6); 
+    font-size: 0.8rem; 
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.tick {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #00f3ff;
+}
+
+.map-instruction {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    z-index: 1000;
+    font-size: 0.8rem;
+}

@@ -1,0 +1,67 @@
+/* Light Background with a soft touch */
+.light-vibrant-bg {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+/* White Glassmorphism Card */
+.glass-card-light {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Text Colors for Light Theme */
+.text-vibrant-pink {
+    color: #d81b60;
+    font-weight: 800;
+}
+
+.text-light-muted {
+    color: #666 !important;
+}
+
+/* Inputs for Light Theme */
+.light-input {
+    background: white !important;
+    border: 2px solid #eee !important;
+    color: #333 !important;
+    border-radius: 10px !important;
+    padding: 12px !important;
+}
+
+.light-input:focus {
+    border-color: #007bff !important;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.1) !important;
+}
+
+/* Location Boxes in Light Mode */
+.location-box-light {
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    background: white;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.location-box-light:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.location-box-light.active-pickup {
+    border-color: #00bcd4;
+    background: #e0f7fa;
+}
+
+.location-box-light.active-dest {
+    border-color: #e91e63;
+    background: #fce4ec;
+}

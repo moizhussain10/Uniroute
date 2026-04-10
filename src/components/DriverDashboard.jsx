@@ -31,27 +31,54 @@ function MapClickHandler({ setPosition }) {
 const DriverDashboard = () => {
     const [loading, setLoading] = useState(false);
     const [showMap, setShowMap] = useState(false);
-    const [targetType, setTargetType] = useState(''); 
+    const [targetType, setTargetType] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [pickup, setPickup] = useState({ coords: null, address: '' });
     const [dest, setDest] = useState({ coords: null, address: '' });
     const [tempPos, setTempPos] = useState([24.8607, 67.0011]);
     const [requests, setRequests] = useState([]);
-    
+
     const provider = new OpenStreetMapProvider();
 
-    // Fetch Incoming Requests (Real-time)
+    // --- Notifications & Requests Logic ---
     useEffect(() => {
+        // 1. Browser se notification ki permission mangna
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
         const user = auth.currentUser;
         if (user) {
             const q = query(
-                collection(db, "requests"), 
-                where("driverId", "==", user.uid), 
-                where("status", "==", "pending")
+                collection(db, "requests"),
+                where("driverId", "==", user.uid),
+                where("status", "==", "pending") // Expired requests khud hi gayab ho jayengi
             );
+
             const unsubscribe = onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    // 2. Sirf tab notification dikhao jab NAYI request (added) aye
+                    if (change.type === "added") {
+                        const newReq = change.doc.data();
+
+                        // Desktop Pop-up Notification
+                        if (Notification.permission === "granted") {
+                            const notification = new Notification("UniRoute: Nayi Request! 🚗", {
+                                body: `${newReq.passengerEmail} ne ride request bheji hai.`,
+                                icon: "/favicon.ico",
+                            });
+                            notification.onclick = () => window.focus();
+                        }
+
+                        // Sound Alert
+                        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
+                        audio.play().catch(err => console.log("Audio play error:", err));
+                    }
+                });
+
                 setRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
             });
+
             return () => unsubscribe();
         }
     }, []);
@@ -127,13 +154,12 @@ const DriverDashboard = () => {
 
                 <Row className="justify-content-center">
                     <Col lg={9}>
-                        {/* Original Post Ride Form Card */}
                         <Card className="border-0 shadow-sm p-4 p-md-5 mb-5" style={{ borderRadius: '20px', background: '#fff' }}>
                             <Form onSubmit={handlePostRide}>
                                 <h5 className="mb-4 text-primary border-bottom pb-2">1. Route Selection</h5>
                                 <Row className="g-4 mb-5">
                                     <Col md={6}>
-                                        <div 
+                                        <div
                                             className={`p-3 border rounded-4 d-flex align-items-center gap-3 transition-all ${pickup.coords ? 'bg-light border-info' : 'bg-white'}`}
                                             onClick={() => { setTargetType('pickup'); setShowMap(true); }}
                                             style={{ cursor: 'pointer', transition: '0.3s' }}
@@ -147,7 +173,7 @@ const DriverDashboard = () => {
                                         </div>
                                     </Col>
                                     <Col md={6}>
-                                        <div 
+                                        <div
                                             className={`p-3 border rounded-4 d-flex align-items-center gap-3 transition-all ${dest.coords ? 'bg-light border-danger' : 'bg-white'}`}
                                             onClick={() => { setTargetType('destination'); setShowMap(true); }}
                                             style={{ cursor: 'pointer', transition: '0.3s' }}
@@ -166,25 +192,25 @@ const DriverDashboard = () => {
                                 <Row className="g-3">
                                     <Col md={4}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-secondary"><FaCar className="me-1"/> Vehicle Name</Form.Label>
+                                            <Form.Label className="small fw-bold text-secondary"><FaCar className="me-1" /> Vehicle Name</Form.Label>
                                             <Form.Control name="vehicleName" required placeholder="e.g. Honda 125" style={{ borderRadius: '10px', padding: '12px' }} />
                                         </Form.Group>
                                     </Col>
                                     <Col md={4}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-secondary"><FaIdCard className="me-1"/> Plate Number</Form.Label>
+                                            <Form.Label className="small fw-bold text-secondary"><FaIdCard className="me-1" /> Plate Number</Form.Label>
                                             <Form.Control name="vehicleNumber" required placeholder="KAE-1234" style={{ borderRadius: '10px', padding: '12px' }} />
                                         </Form.Group>
                                     </Col>
                                     <Col md={4}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-secondary"><FaClock className="me-1"/> Time</Form.Label>
+                                            <Form.Label className="small fw-bold text-secondary"><FaClock className="me-1" /> Time</Form.Label>
                                             <Form.Control name="time" type="time" required style={{ borderRadius: '10px', padding: '12px' }} />
                                         </Form.Group>
                                     </Col>
                                     <Col md={4}>
                                         <Form.Group className="mt-2">
-                                            <Form.Label className="small fw-bold text-secondary"><FaUsers className="me-1"/> Seats Available</Form.Label>
+                                            <Form.Label className="small fw-bold text-secondary"><FaUsers className="me-1" /> Seats Available</Form.Label>
                                             <Form.Select name="seats" style={{ borderRadius: '10px', padding: '12px' }}>
                                                 <option value="1">1 Seat</option>
                                                 <option value="2">2 Seats</option>
@@ -201,7 +227,6 @@ const DriverDashboard = () => {
                             </Form>
                         </Card>
 
-                        {/* --- Requests Section with Matching UI --- */}
                         <div className="mt-5">
                             <h4 className="fw-bold mb-4" style={{ color: '#2c3e50' }}>Incoming Passenger Requests 🔔</h4>
                             {requests.length > 0 ? (
@@ -212,7 +237,7 @@ const DriverDashboard = () => {
                                                 <FaUserCircle size={45} className="text-secondary me-3" />
                                                 <div>
                                                     <h6 className="mb-0 fw-bold">{req.passengerEmail}</h6>
-                                                    <small className="text-muted d-block">{req.pickup} <FaArrowRight size={10}/> {req.destination}</small>
+                                                    <small className="text-muted d-block">{req.pickup} <FaArrowRight size={10} /> {req.destination}</small>
                                                 </div>
                                             </div>
                                             <div className="d-flex gap-2">
@@ -231,13 +256,12 @@ const DriverDashboard = () => {
                     </Col>
                 </Row>
 
-                {/* Map Modal */}
                 <Modal show={showMap} onHide={() => setShowMap(false)} centered size="lg">
                     <Modal.Header closeButton className="border-0">
                         <Form className="w-100 me-3" onSubmit={handleMapSearch}>
                             <InputGroup>
-                                <Form.Control 
-                                    placeholder="Search location..." 
+                                <Form.Control
+                                    placeholder="Search location..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     style={{ borderRadius: '10px 0 0 10px' }}
@@ -251,7 +275,7 @@ const DriverDashboard = () => {
                     <Modal.Body className="p-0">
                         <div style={{ height: '450px', width: '100%' }}>
                             <MapContainer center={tempPos} zoom={13} style={{ height: '100%', width: '100%' }}>
-                                <ChangeView center={tempPos} /> 
+                                <ChangeView center={tempPos} />
                                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                                 <Marker position={tempPos} icon={DefaultIcon} />
                                 <MapClickHandler setPosition={setTempPos} />

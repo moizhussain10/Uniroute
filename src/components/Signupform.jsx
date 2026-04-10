@@ -80,8 +80,8 @@ const Signupform = ({ registeruser }) => {
                 <Form.Group className="mb-5" controlId="formBasicRole">
                   <Form.Label className="small fw-bold text-secondary">I want to:</Form.Label>
                   <Form.Select name="role" className="light-input custom-select-light" style={{ borderRadius: '10px' }} required>
-                    <option value="student">Take a Ride (Student/Passenger)</option>
-                    <option value="driver">Offer a Ride (Driver/Owner)</option>
+                    <option value="student">Passenger</option>
+                    <option value="driver">Driver</option>
                   </Form.Select>
                 </Form.Group>
 

@@ -44,7 +44,7 @@ const StudentDashboard = () => {
     const distance = R * c; 
 
     const baseFare = 50; 
-    const perKmRate = 15; 
+    const perKmRate = 20; 
     return Math.round(baseFare + (distance * perKmRate));
   };
 

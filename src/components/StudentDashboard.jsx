@@ -179,7 +179,7 @@ const StudentDashboard = () => {
                     variant="outline-info" 
                     className="flex-grow-1" 
                     style={{ borderRadius: '10px' }}
-                    onClick={() => handleViewRoute(ride.pickup, ride.destination)}
+                    onClick={() => window.open(`https://www.google.com/maps/dir/${encodeURIComponent(ride.pickup)}/${encodeURIComponent(ride.destination)}`, '_blank')}
                   >
                     <FaRoute /> Route
                   </Button>

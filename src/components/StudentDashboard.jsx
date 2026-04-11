@@ -8,7 +8,7 @@ const StudentDashboard = () => {
   const [rides, setRides] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  
+
   const [activeRequestId, setActiveRequestId] = useState(null);
   const [timer, setTimer] = useState(0);
   const [requestingId, setRequestingId] = useState(null);
@@ -27,15 +27,15 @@ const StudentDashboard = () => {
     if (!pickupCoords || !destCoords) return 50;
     const [lat1, lon1] = pickupCoords;
     const [lat2, lon2] = destCoords;
-    const R = 6371; 
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; 
-    const baseFare = 50; 
-    const perKmRate = 20; 
+    const distance = R * c;
+    const baseFare = 50;
+    const perKmRate = 20;
     return Math.round(baseFare + (distance * perKmRate));
   };
 
@@ -99,7 +99,7 @@ const StudentDashboard = () => {
         createdAt: serverTimestamp()
       });
       setActiveRequestId(docRef.id);
-      setTimer(10); 
+      setTimer(10);
     } catch (error) {
       alert("Error: " + error.message);
     } finally {
@@ -109,14 +109,22 @@ const StudentDashboard = () => {
 
   // --- Map Function Logic ---
   const handleViewRoute = (pickup, destination) => {
+    // Ye standard format hai jo live site par kabhi block nahi hota
     const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
-    window.open(url, '_blank');
+
+    // Nayi window mein open karne ke liye
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+
+    // Agar popup blocker ne block kiya ho toh safe side ke liye check
+    if (!newWindow) {
+      alert("Please allow popups for this site to view the route.");
+    }
   };
 
   const filteredRides = rides.filter(ride =>
-    ride.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ride.pickup.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ride.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  ride.pickup.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   return (
     <Container className="py-4">
@@ -159,34 +167,34 @@ const StudentDashboard = () => {
 
                 <div className="ps-2 border-start border-2 border-dashed ms-3 my-2">
                   <div className="mb-2">
-                    <small className="text-muted d-block">Pickup</small> 
+                    <small className="text-muted d-block">Pickup</small>
                     <strong className="text-truncate d-block">{ride.pickup}</strong>
                   </div>
                   <div className="mb-3">
-                    <small className="text-muted d-block">Destination</small> 
+                    <small className="text-muted d-block">Destination</small>
                     <strong className="text-truncate d-block">{ride.destination}</strong>
                   </div>
                 </div>
 
                 <div className="d-flex justify-content-between align-items-center p-2 mb-3 bg-light rounded-3">
-                    <small className="text-secondary fw-bold"><FaMoneyBillWave className="me-1"/> Est. Fare</small>
-                    <span className="text-primary fw-bold fs-5">Rs. {fare}</span>
+                  <small className="text-secondary fw-bold"><FaMoneyBillWave className="me-1" /> Est. Fare</small>
+                  <span className="text-primary fw-bold fs-5">Rs. {fare}</span>
                 </div>
 
                 <div className="d-flex gap-2 mt-auto">
                   {/* --- Route Button Back --- */}
-                  <Button 
-                    variant="outline-info" 
-                    className="flex-grow-1" 
+                  <Button
+                    variant="outline-info"
+                    className="flex-grow-1"
                     style={{ borderRadius: '10px' }}
-                    onClick={() => window.open(`https://www.google.com/maps/dir/${encodeURIComponent(ride.pickup)}/${encodeURIComponent(ride.destination)}`, '_blank')}
+                    onClick={() => handleViewRoute(ride.pickup, ride.destination)}
                   >
                     <FaRoute /> Route
                   </Button>
-                  
+
                   {activeRequestId && timer > 0 ? (
                     <Button variant="warning" disabled className="flex-grow-1" style={{ borderRadius: '10px' }}>
-                       {timer}s...
+                      {timer}s...
                     </Button>
                   ) : (
                     <Button

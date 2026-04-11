@@ -9,12 +9,10 @@ const StudentDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   
-  // Timer aur Request States
   const [activeRequestId, setActiveRequestId] = useState(null);
   const [timer, setTimer] = useState(0);
   const [requestingId, setRequestingId] = useState(null);
 
-  // 1. Rides Fetching Logic
   useEffect(() => {
     const q = query(collection(db, "rides"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -25,33 +23,24 @@ const StudentDashboard = () => {
     return () => unsubscribe();
   }, []);
 
-  // 2. Price Calculation Logic (Haversine Formula)
   const calculateFare = (pickupCoords, destCoords) => {
-    if (!pickupCoords || !destCoords) return 50; // Default base fare agar coords na hon
-
+    if (!pickupCoords || !destCoords) return 50;
     const [lat1, lon1] = pickupCoords;
     const [lat2, lon2] = destCoords;
-
-    const R = 6371; // Earth's radius in KM
+    const R = 6371; 
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    
-    const a = 
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c; 
-
     const baseFare = 50; 
     const perKmRate = 20; 
     return Math.round(baseFare + (distance * perKmRate));
   };
 
-  // 3. Status Monitor (Timer ko rokne ke liye)
   useEffect(() => {
     if (!activeRequestId) return;
-
     const unsubscribe = onSnapshot(doc(db, "requests", activeRequestId), (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
@@ -62,11 +51,9 @@ const StudentDashboard = () => {
         }
       }
     });
-
     return () => unsubscribe();
   }, [activeRequestId]);
 
-  // 4. Timer Countdown Logic
   useEffect(() => {
     let interval;
     if (timer > 0 && activeRequestId) {
@@ -79,17 +66,14 @@ const StudentDashboard = () => {
     return () => clearInterval(interval);
   }, [timer, activeRequestId]);
 
-  // 5. Expire Logic
   const handleExpire = async (reqId) => {
     try {
       const requestRef = doc(db, "requests", reqId);
       const snap = await getDoc(requestRef);
-      
       if (snap.exists() && snap.data().status === "pending") {
         await updateDoc(requestRef, { status: 'expired' });
         alert("Driver ne respond nahi kiya. Request expired!");
       }
-      
       setActiveRequestId(null);
       setTimer(0);
     } catch (error) {
@@ -97,13 +81,10 @@ const StudentDashboard = () => {
     }
   };
 
-  // 6. Handle Request Function
   const handleRequestRide = async (ride) => {
     const user = auth.currentUser;
     if (!user) return alert("Pehle login karein!");
-
     const estimatedFare = calculateFare(ride.pickupCoords, ride.destCoords);
-
     try {
       setRequestingId(ride.id);
       const docRef = await addDoc(collection(db, "requests"), {
@@ -117,7 +98,6 @@ const StudentDashboard = () => {
         status: "pending",
         createdAt: serverTimestamp()
       });
-
       setActiveRequestId(docRef.id);
       setTimer(10); 
     } catch (error) {
@@ -125,6 +105,12 @@ const StudentDashboard = () => {
     } finally {
       setRequestingId(null);
     }
+  };
+
+  // --- Map Function Logic ---
+  const handleViewRoute = (pickup, destination) => {
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
+    window.open(url, '_blank');
   };
 
   const filteredRides = rides.filter(ride =>
@@ -136,7 +122,7 @@ const StudentDashboard = () => {
     <Container className="py-4">
       <div className="mb-5 text-center">
         <h2 className="fw-bold text-primary">Find Your Ride 🚗</h2>
-        <p className="text-muted">Price calculation aur auto-timer ke saath behtareen safar.</p>
+        <p className="text-muted">Ab live route aur price calculation ke saath.</p>
       </div>
 
       <Row className="justify-content-center mb-5">
@@ -182,14 +168,19 @@ const StudentDashboard = () => {
                   </div>
                 </div>
 
-                {/* --- Price Display --- */}
                 <div className="d-flex justify-content-between align-items-center p-2 mb-3 bg-light rounded-3">
                     <small className="text-secondary fw-bold"><FaMoneyBillWave className="me-1"/> Est. Fare</small>
                     <span className="text-primary fw-bold fs-5">Rs. {fare}</span>
                 </div>
 
                 <div className="d-flex gap-2 mt-auto">
-                  <Button variant="outline-info" className="flex-grow-1" style={{ borderRadius: '10px' }}>
+                  {/* --- Route Button Back --- */}
+                  <Button 
+                    variant="outline-info" 
+                    className="flex-grow-1" 
+                    style={{ borderRadius: '10px' }}
+                    onClick={() => handleViewRoute(ride.pickup, ride.destination)}
+                  >
                     <FaRoute /> Route
                   </Button>
                   

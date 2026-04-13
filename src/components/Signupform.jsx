@@ -19,14 +19,13 @@ const Signupform = ({ registeruser }) => {
     // "bg-gradient-dark" ko "light-vibrant-bg" se replace kiya
     <div className="light-vibrant-bg d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
       <Container>
-        <Row className="justify-content-center">
+        <Row className="justify-content-center mx-o">
           <Col xs={12} sm={10} md={8} lg={6}>
             {/* "glass-card" ko "glass-card-light" se replace kiya aur "p-5" card radius barha di */}
             <Card className="p-4 p-md-5 glass-card-light animate-slide-up shadow-sm border-0" style={{ borderRadius: '20px' }}>
               <div className="text-center mb-5">
                 {/* Neon text hata kar bold professional text kar diya */}
                 <h2 className="fw-bold mb-1" style={{ color: '#007bff', letterSpacing: '1px' }}>UniRoute</h2>
-                <p className="text-muted small">Smart Commute. Easy Rides. Better Connect.</p>
               </div>
 
               <Form onSubmit={handleSubmit}>
@@ -47,7 +46,7 @@ const Signupform = ({ registeruser }) => {
 
                 {/* Email Input */}
                 <Form.Group className="mb-4" controlId="formBasicEmail">
-                  <Form.Label className="small fw-bold text-secondary">Uni/Office Email Address</Form.Label>
+                  <Form.Label className="small fw-bold text-secondary">Email Address</Form.Label>
                   <InputGroup className="shadow-xs rounded-3 overflow-hidden">
                       <InputGroup.Text className="bg-white border-end-0 text-muted"><FaEnvelope /></InputGroup.Text>
                       <Form.Control 

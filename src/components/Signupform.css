@@ -1,11 +1,10 @@
-/* LIGHT VIBRANT BACKGROUND */
+/* --- APKA ORIGINAL CODE START --- */
 .light-vibrant-bg {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     min-height: 100vh;
     width: 100%;
 }
 
-/* WHITE GLASSMORPHISM CARD */
 .glass-card-light {
     background: rgba(255, 255, 255, 0.8) !important;
     backdrop-filter: blur(20px);
@@ -19,7 +18,6 @@
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
 }
 
-/* INPUT FIELDS - LIGHT & CLEAN */
 .light-input {
     background: #ffffff !important;
     border: 2px solid #e0e6ed !important;
@@ -35,7 +33,6 @@
     box-shadow: 0 0 15px rgba(0, 123, 255, 0.1) !important;
 }
 
-/* INPUTGROUP TEXT (ICONS) */
 .input-group-text {
     background: #ffffff !important;
     border: 2px solid #e0e6ed !important;
@@ -44,7 +41,6 @@
     font-size: 1.1rem;
 }
 
-/* CUSTOM SELECT DROPDOWN ARROW */
 .custom-select-light {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23007bff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
     background-position: right 1rem center !important;
@@ -52,7 +48,6 @@
     background-size: 14px 14px !important;
 }
 
-/* ANIMATION */
 .animate-slide-up {
     animation: slideIn 0.8s ease-out;
 }
@@ -60,4 +55,52 @@
 @keyframes slideIn {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
+}
+/* --- APKA ORIGINAL CODE END --- */
+
+
+/* --- RESPONSIVE MEDIA QUERIES (NEW) --- */
+
+@media (max-width: 768px) {
+    /* Tablet par card ki padding thori kam */
+    .glass-card-light {
+        padding: 2rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Mobile par container aur card ki settings */
+    .light-vibrant-bg {
+        padding: 20px 10px; /* Screen edges se space */
+        display: flex;
+        align-items: center;
+    }
+
+    .glass-card-light {
+        padding: 1.5rem !important; /* Mobile par card chota aur clean lagega */
+        margin: 0 auto;
+        border-radius: 15px !important;
+    }
+
+    /* Heading fix */
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    /* Input zoom fix for mobile browsers */
+    .light-input {
+        font-size: 16px !important; 
+        padding: 10px !important;
+    }
+
+    /* Button size adjustment for smaller screens */
+    button[type="submit"] {
+        padding: 12px !important;
+        font-size: 1rem !important;
+    }
+
+    .input-group-text {
+    display: none;
+
+}
 }

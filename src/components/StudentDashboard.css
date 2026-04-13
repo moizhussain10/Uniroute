@@ -1,0 +1,103 @@
+/* StudentDashboard.css */
+
+/* Desktop par sidebar ki wajah se margin (Router logic ke sath sync) */
+.dashboard-main-container {
+    transition: all 0.3s ease;
+}
+
+/* Card Improvements */
+.ride-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #f0f0f0 !important;
+}
+
+.ride-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+}
+
+/* Timeline vertical line logic */
+.route-line {
+    position: absolute;
+    width: 2px;
+    height: 35px;
+    background: #e9ecef;
+    left: 7px;
+    top: 18px;
+    z-index: 1;
+}
+
+/* Mobile Responsive Fixes */
+@media (max-width: 768px) {
+    .dashboard-header h3 {
+        font-size: 1.5rem;
+    }
+    
+    .search-group {
+        width: 100% !important;
+        margin-bottom: 20px;
+    }
+
+    .ride-card-body {
+        padding: 15px !important;
+    }
+
+    /* Taake buttons ek ke niche ek na aayein, gap barabar rahe */
+    .action-buttons-gap {
+        gap: 8px !important;
+    }
+
+    /* Bottom spacing for mobile navigation nav bar */
+    .dashboard-main-container {
+        padding-bottom: 100px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .ride-card h6 {
+        font-size: 0.95rem;
+    }
+    .nav-icon-adjust {
+        font-size: 1rem !important;
+    }
+}
+
+/* Sidebar.css ke niche ye add karein */
+
+/* Desktop Fix */
+@media (min-width: 769px) {
+  .dashboard-main-container, 
+  .profile-container, 
+  .main-content {
+    margin-left: 280px !important; /* Sidebar ki jagah pakki */
+    width: calc(100% - 280px) !important;
+  }
+}
+
+/* Mobile Fix (The "Bura lag raha hai" Solver) */
+@media (max-width: 768px) {
+  .dashboard-main-container, 
+  .profile-container, 
+  .main-content {
+    margin-left: 0 !important; /* Mobile pe koi margin nahi */
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    width: 100% !important;
+  }
+
+  /* Cards ko mobile pe full width karne ke liye */
+  .row {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+  
+  .col-12 {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+
+  /* Card ke andar ka text responsive */
+  .ride-card-body {
+    padding: 12px !important;
+  }
+}

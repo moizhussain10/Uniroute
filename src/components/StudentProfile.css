@@ -1,0 +1,38 @@
+/* StudentProfile.css */
+
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .profile-container {
+        padding-top: 20px !important;
+    }
+    
+    .user-info-card {
+        margin-bottom: 20px;
+    }
+
+    /* Long address/location names handling */
+    .location-text {
+        font-size: 0.85rem;
+        word-break: break-word;
+    }
+
+    /* Status badge size for small screens */
+    .status-badge {
+        font-size: 0.7rem !important;
+        padding: 6px 10px !important;
+    }
+    
+    /* Ride list item padding */
+    .request-item-inner {
+        padding: 12px !important;
+    }
+}

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Form, InputGroup, Spinner } from 'react-bootstrap';
-import { FaSearch, FaUserCircle, FaRoute, FaMoneyBillWave } from 'react-icons/fa';
+import { FaSearch, FaUserCircle, FaMapMarkerAlt, FaLocationArrow } from 'react-icons/fa';
 import { db, auth } from '../config/firebase';
 import { collection, onSnapshot, query, addDoc, serverTimestamp, doc, updateDoc, getDoc } from 'firebase/firestore';
+import './StudentDashboard.css';
 
 const StudentDashboard = () => {
   const [rides, setRides] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-
   const [activeRequestId, setActiveRequestId] = useState(null);
   const [timer, setTimer] = useState(0);
   const [requestingId, setRequestingId] = useState(null);
@@ -33,10 +33,7 @@ const StudentDashboard = () => {
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c;
-    const baseFare = 50;
-    const perKmRate = 20;
-    return Math.round(baseFare + (distance * perKmRate));
+    return Math.round(50 + (R * c * 20));
   };
 
   useEffect(() => {
@@ -57,9 +54,7 @@ const StudentDashboard = () => {
   useEffect(() => {
     let interval;
     if (timer > 0 && activeRequestId) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+      interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
     } else if (timer === 0 && activeRequestId) {
       handleExpire(activeRequestId);
     }
@@ -76,9 +71,7 @@ const StudentDashboard = () => {
       }
       setActiveRequestId(null);
       setTimer(0);
-    } catch (error) {
-      console.error("Expire error:", error);
-    }
+    } catch (e) { console.error(e); }
   };
 
   const handleRequestRide = async (ride) => {
@@ -99,121 +92,111 @@ const StudentDashboard = () => {
         createdAt: serverTimestamp()
       });
       setActiveRequestId(docRef.id);
-      setTimer(10);
-    } catch (error) {
-      alert("Error: " + error.message);
-    } finally {
-      setRequestingId(null);
-    }
+      setTimer(30); // 30 seconds wait
+    } catch (e) { alert(e.message); }
+    finally { setRequestingId(null); }
   };
 
-  // --- Map Function Logic ---
   const handleViewRoute = (pickup, destination) => {
-    // Ye standard format hai jo live site par kabhi block nahi hota
     const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
-
-    // Nayi window mein open karne ke liye
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-
-    // Agar popup blocker ne block kiya ho toh safe side ke liye check
-    if (!newWindow) {
-      alert("Please allow popups for this site to view the route.");
-    }
+    window.open(url, '_blank');
   };
 
   const filteredRides = rides.filter(ride =>
-  ride.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  ride.pickup.toLowerCase().includes(searchTerm.toLowerCase())
-);
+    ride.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ride.pickup.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <Container className="py-4">
-      <div className="mb-5 text-center">
-        <h2 className="fw-bold text-primary">Find Your Ride 🚗</h2>
-        <p className="text-muted">Ab live route aur price calculation ke saath.</p>
-      </div>
+    <div className="dashboard-wrapper">
+      <Container fluid className="py-4">
+        
+        <div className="dashboard-header text-center mb-4">
+          <h3 className="fw-bold">Available Rides</h3>
+          <p className="text-muted small">Karachi University Commute</p>
+        </div>
 
-      <Row className="justify-content-center mb-5">
-        <Col md={8}>
-          <InputGroup className="shadow-sm rounded-pill overflow-hidden border-0">
-            <InputGroup.Text className="bg-white border-0 ps-4 text-primary"><FaSearch /></InputGroup.Text>
-            <Form.Control
-              placeholder="Kahan jana hai?"
-              className="py-3 border-0 shadow-none"
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </InputGroup>
-        </Col>
-      </Row>
+        <Row className="justify-content-center mb-4 g-0">
+          <Col xs={12} md={8} lg={6}>
+            <InputGroup className="search-group-container shadow-sm overflow-hidden">
+              <InputGroup.Text className="bg-white border-0 ps-3">
+                <FaSearch className="text-primary" />
+              </InputGroup.Text>
+              <Form.Control
+                placeholder="Search by area..."
+                className="border-0 shadow-none py-2 py-md-3"
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </InputGroup>
+          </Col>
+        </Row>
 
-      <Row>
-        {loading ? (
-          <div className="text-center w-100"><Spinner animation="border" variant="primary" /></div>
-        ) : filteredRides.map((ride) => {
-          const fare = calculateFare(ride.pickupCoords, ride.destCoords);
-          return (
-            <Col key={ride.id} lg={4} md={6} className="mb-4">
-              <Card className="border-0 shadow-sm p-3 h-100" style={{ borderRadius: '15px' }}>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <div className="d-flex align-items-center gap-2">
-                    <FaUserCircle size={40} className="text-secondary" />
-                    <div>
-                      <h6 className="mb-0 fw-bold">{ride.driverName || "Driver"}</h6>
-                      <small className="text-muted">{ride.vehicleName}</small>
+        <Row className="g-3">
+          {loading ? (
+            <div className="text-center w-100 py-5"><Spinner animation="grow" variant="primary" /></div>
+          ) : filteredRides.length > 0 ? (
+            filteredRides.map((ride) => (
+              <Col key={ride.id} xs={12} sm={6} xl={4}>
+                <Card className="ride-card h-100 border-0 shadow-sm">
+                  <Card.Body className="p-3">
+                    <div className="d-flex justify-content-between mb-3">
+                      <div className="d-flex align-items-center">
+                        <FaUserCircle size={35} className="text-primary me-2" />
+                        <div>
+                          <h6 className="mb-0 fw-bold">{ride.driverName || "Driver"}</h6>
+                          <small className="text-muted">{ride.vehicleName || "Car"}</small>
+                        </div>
+                      </div>
+                      <Badge bg="soft-success" className="status-badge-live">Live</Badge>
                     </div>
-                  </div>
-                  <Badge bg="success">Available</Badge>
-                </div>
 
-                <div className="ps-2 border-start border-2 border-dashed ms-3 my-2">
-                  <div className="mb-2">
-                    <small className="text-muted d-block">Pickup</small>
-                    <strong className="text-truncate d-block">{ride.pickup}</strong>
-                  </div>
-                  <div className="mb-3">
-                    <small className="text-muted d-block">Destination</small>
-                    <strong className="text-truncate d-block">{ride.destination}</strong>
-                  </div>
-                </div>
+                    <div className="route-visual-container mb-3">
+                      <div className="route-line-vertical"></div>
+                      <div className="route-stop">
+                        <FaLocationArrow className="icon-pickup" />
+                        <div className="ms-3">
+                          <span className="route-label">PICKUP</span>
+                          <p className="route-address text-truncate">{ride.pickup}</p>
+                        </div>
+                      </div>
+                      <div className="route-stop mt-3">
+                        <FaMapMarkerAlt className="icon-dest" />
+                        <div className="ms-3">
+                          <span className="route-label">DESTINATION</span>
+                          <p className="route-address text-truncate">{ride.destination}</p>
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="d-flex justify-content-between align-items-center p-2 mb-3 bg-light rounded-3">
-                  <small className="text-secondary fw-bold"><FaMoneyBillWave className="me-1" /> Est. Fare</small>
-                  <span className="text-primary fw-bold fs-5">Rs. {fare}</span>
-                </div>
+                    <div className="fare-display mb-3">
+                      <span>Est. Fare</span>
+                      <span className="amount">Rs. {calculateFare(ride.pickupCoords, ride.destCoords)}</span>
+                    </div>
 
-                <div className="d-flex gap-2 mt-auto">
-                  {/* --- Route Button Back --- */}
-                  <Button
-                    variant="outline-info"
-                    className="flex-grow-1"
-                    style={{ borderRadius: '10px' }}
-                    onClick={() => handleViewRoute(ride.pickup, ride.destination)}
-                  >
-                    <FaRoute /> Route
-                  </Button>
-
-                  {activeRequestId && timer > 0 ? (
-                    <Button variant="warning" disabled className="flex-grow-1" style={{ borderRadius: '10px' }}>
-                      {timer}s...
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      className="flex-grow-1"
-                      style={{ borderRadius: '10px' }}
-                      disabled={requestingId === ride.id || activeRequestId !== null}
-                      onClick={() => handleRequestRide(ride)}
-                    >
-                      {requestingId === ride.id ? <Spinner size="sm" /> : "Request"}
-                    </Button>
-                  )}
-                </div>
-              </Card>
-            </Col>
-          );
-        })}
-      </Row>
-    </Container>
+                    <div className="d-flex gap-2">
+                      <Button variant="light" className="w-50 btn-map" onClick={() => handleViewRoute(ride.pickup, ride.destination)}>
+                        Map
+                      </Button>
+                      <Button 
+                        variant="primary" 
+                        className="w-50 btn-book flex-grow-1"
+                        disabled={activeRequestId !== null}
+                        onClick={() => handleRequestRide(ride)}
+                      >
+                        {requestingId === ride.id ? <Spinner size="sm" /> : 
+                         activeRequestId && timer > 0 ? `Waiting ${timer}s` : "Book Ride"}
+                      </Button>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))
+          ) : (
+            <div className="text-center w-100 py-5">No rides found.</div>
+          )}
+        </Row>
+      </Container>
+    </div>
   );
 };
 

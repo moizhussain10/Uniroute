@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Form, Modal, Spinner, InputGroup, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Modal, Spinner, InputGroup } from 'react-bootstrap';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import { FaMapMarkedAlt, FaCheckCircle, FaCar, FaClock, FaUsers, FaArrowRight, FaSearch, FaIdCard, FaPalette, FaUserCircle } from 'react-icons/fa';
@@ -40,9 +40,7 @@ const DriverDashboard = () => {
 
     const provider = new OpenStreetMapProvider();
 
-    // --- Notifications & Requests Logic ---
     useEffect(() => {
-        // 1. Browser se notification ki permission mangna
         if (Notification.permission !== "granted") {
             Notification.requestPermission();
         }
@@ -52,16 +50,13 @@ const DriverDashboard = () => {
             const q = query(
                 collection(db, "requests"),
                 where("driverId", "==", user.uid),
-                where("status", "==", "pending") // Expired requests khud hi gayab ho jayengi
+                where("status", "==", "pending")
             );
 
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
-                    // 2. Sirf tab notification dikhao jab NAYI request (added) aye
                     if (change.type === "added") {
                         const newReq = change.doc.data();
-
-                        // Desktop Pop-up Notification
                         if (Notification.permission === "granted") {
                             const notification = new Notification("UniRoute: Nayi Request! 🚗", {
                                 body: `${newReq.passengerEmail} ne ride request bheji hai.`,
@@ -69,16 +64,12 @@ const DriverDashboard = () => {
                             });
                             notification.onclick = () => window.focus();
                         }
-
-                        // Sound Alert
                         const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
                         audio.play().catch(err => console.log("Audio play error:", err));
                     }
                 });
-
                 setRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
             });
-
             return () => unsubscribe();
         }
     }, []);
@@ -145,77 +136,77 @@ const DriverDashboard = () => {
     };
 
     return (
-        <div className="light-vibrant-bg py-5" style={{ minHeight: '100vh', background: '#f8f9fa' }}>
+        <div className="light-vibrant-bg py-4 py-md-5">
             <Container className="animate-slide-up">
-                <div className="text-center mb-5">
-                    <h2 className="fw-bold" style={{ color: '#2c3e50' }}>DRIVER DASHBOARD <FaPalette className="ms-2 text-primary" /></h2>
-                    <p className="text-muted">Apni ride ki details enter karein aur passengers dhoondein.</p>
+                <div className="text-center mb-4 mb-md-5">
+                    <h2 className="fw-bold px-2" style={{ color: '#2c3e50' }}>DRIVER DASHBOARD <FaPalette className="ms-2 text-primary d-none d-sm-inline" /></h2>
+                    <p className="text-muted small px-3">Apni ride ki details enter karein aur passengers dhoondein.</p>
                 </div>
 
-                <Row className="justify-content-center">
-                    <Col lg={9}>
-                        <Card className="border-0 shadow-sm p-4 p-md-5 mb-5" style={{ borderRadius: '20px', background: '#fff' }}>
+                <Row className="justify-content-center mx-0">
+                    <Col xs={12} lg={10} xl={9}>
+                        <Card className="border-0 shadow-sm p-3 p-md-5 mb-5" style={{ borderRadius: '20px', background: '#fff' }}>
                             <Form onSubmit={handlePostRide}>
                                 <h5 className="mb-4 text-primary border-bottom pb-2">1. Route Selection</h5>
-                                <Row className="g-4 mb-5">
-                                    <Col md={6}>
+                                <Row className="g-3 mb-5">
+                                    <Col xs={12} md={6}>
                                         <div
-                                            className={`p-3 border rounded-4 d-flex align-items-center gap-3 transition-all ${pickup.coords ? 'bg-light border-info' : 'bg-white'}`}
+                                            className={`p-3 border rounded-4 d-flex align-items-center gap-3 transition-all h-100 ${pickup.coords ? 'bg-light border-info' : 'bg-white'}`}
                                             onClick={() => { setTargetType('pickup'); setShowMap(true); }}
                                             style={{ cursor: 'pointer', transition: '0.3s' }}
                                         >
-                                            <FaMapMarkedAlt size={24} className="text-info" />
+                                            <FaMapMarkedAlt size={24} className="text-info flex-shrink-0" />
                                             <div className="overflow-hidden">
-                                                <h6 className="mb-1 text-dark">Starting Point</h6>
+                                                <h6 className="mb-1 text-dark small fw-bold">Starting Point</h6>
                                                 <p className="small text-muted mb-0 text-truncate">{pickup.address || "Tap to select on map"}</p>
                                             </div>
-                                            {pickup.coords && <FaCheckCircle className="ms-auto text-success" />}
+                                            {pickup.coords && <FaCheckCircle className="ms-auto text-success flex-shrink-0" />}
                                         </div>
                                     </Col>
-                                    <Col md={6}>
+                                    <Col xs={12} md={6}>
                                         <div
-                                            className={`p-3 border rounded-4 d-flex align-items-center gap-3 transition-all ${dest.coords ? 'bg-light border-danger' : 'bg-white'}`}
+                                            className={`p-3 border rounded-4 d-flex align-items-center gap-3 transition-all h-100 ${dest.coords ? 'bg-light border-danger' : 'bg-white'}`}
                                             onClick={() => { setTargetType('destination'); setShowMap(true); }}
                                             style={{ cursor: 'pointer', transition: '0.3s' }}
                                         >
-                                            <FaMapMarkedAlt size={24} className="text-danger" />
+                                            <FaMapMarkedAlt size={24} className="text-danger flex-shrink-0" />
                                             <div className="overflow-hidden">
-                                                <h6 className="mb-1 text-dark">Final Destination</h6>
+                                                <h6 className="mb-1 text-dark small fw-bold">Final Destination</h6>
                                                 <p className="small text-muted mb-0 text-truncate">{dest.address || "Tap to select on map"}</p>
                                             </div>
-                                            {dest.coords && <FaCheckCircle className="ms-auto text-success" />}
+                                            {dest.coords && <FaCheckCircle className="ms-auto text-success flex-shrink-0" />}
                                         </div>
                                     </Col>
                                 </Row>
 
                                 <h5 className="mb-4 text-primary border-bottom pb-2">2. Ride Details</h5>
                                 <Row className="g-3">
-                                    <Col md={4}>
+                                    <Col xs={12} md={6} lg={4}>
                                         <Form.Group>
                                             <Form.Label className="small fw-bold text-secondary"><FaCar className="me-1" /> Vehicle Name</Form.Label>
                                             <Form.Control name="vehicleName" required placeholder="e.g. Honda 125" style={{ borderRadius: '10px', padding: '12px' }} />
                                         </Form.Group>
                                     </Col>
-                                    <Col md={4}>
+                                    <Col xs={12} md={6} lg={4}>
                                         <Form.Group>
                                             <Form.Label className="small fw-bold text-secondary"><FaIdCard className="me-1" /> Plate Number</Form.Label>
                                             <Form.Control name="vehicleNumber" required placeholder="KAE-1234" style={{ borderRadius: '10px', padding: '12px' }} />
                                         </Form.Group>
                                     </Col>
-                                    <Col md={4}>
+                                    <Col xs={6} md={6} lg={2}>
                                         <Form.Group>
                                             <Form.Label className="small fw-bold text-secondary"><FaClock className="me-1" /> Time</Form.Label>
                                             <Form.Control name="time" type="time" required style={{ borderRadius: '10px', padding: '12px' }} />
                                         </Form.Group>
                                     </Col>
-                                    <Col md={4}>
-                                        <Form.Group className="mt-2">
-                                            <Form.Label className="small fw-bold text-secondary"><FaUsers className="me-1" /> Seats Available</Form.Label>
+                                    <Col xs={6} md={6} lg={2}>
+                                        <Form.Group>
+                                            <Form.Label className="small fw-bold text-secondary"><FaUsers className="me-1" /> Seats</Form.Label>
                                             <Form.Select name="seats" style={{ borderRadius: '10px', padding: '12px' }}>
-                                                <option value="1">1 Seat</option>
-                                                <option value="2">2 Seats</option>
-                                                <option value="3">3 Seats</option>
-                                                <option value="4">4 Seats</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
                                             </Form.Select>
                                         </Form.Group>
                                     </Col>
@@ -227,38 +218,38 @@ const DriverDashboard = () => {
                             </Form>
                         </Card>
 
-                        <div className="mt-5">
-                            <h4 className="fw-bold mb-4" style={{ color: '#2c3e50' }}>Incoming Passenger Requests 🔔</h4>
+                        <div className="mt-4 px-2">
+                            <h4 className="fw-bold mb-4" style={{ color: '#2c3e50' }}>Incoming Requests 🔔</h4>
                             {requests.length > 0 ? (
                                 requests.map((req) => (
                                     <Card key={req.id} className="border-0 shadow-sm mb-3 p-3 animate-slide-up" style={{ borderRadius: '15px', borderLeft: '5px solid #0d6efd' }}>
                                         <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
                                             <div className="d-flex align-items-center">
-                                                <FaUserCircle size={45} className="text-secondary me-3" />
-                                                <div>
-                                                    <h6 className="mb-0 fw-bold">{req.passengerEmail}</h6>
-                                                    <small className="text-muted d-block">{req.pickup} <FaArrowRight size={10} /> {req.destination}</small>
+                                                <FaUserCircle size={40} className="text-secondary me-3 flex-shrink-0" />
+                                                <div className="overflow-hidden">
+                                                    <h6 className="mb-0 fw-bold text-truncate">{req.passengerEmail}</h6>
+                                                    <small className="text-muted d-block text-truncate">{req.pickup} → {req.destination}</small>
                                                 </div>
                                             </div>
-                                            <div className="d-flex gap-2">
-                                                <Button variant="success" size="sm" className="px-3 rounded-pill fw-bold" onClick={() => handleAction(req.id, 'accepted')}>Accept</Button>
-                                                <Button variant="outline-danger" size="sm" className="px-3 rounded-pill fw-bold" onClick={() => handleAction(req.id, 'rejected')}>Reject</Button>
+                                            <div className="d-flex gap-2 w-100 w-md-auto">
+                                                <Button variant="success" size="sm" className="px-3 rounded-pill fw-bold flex-grow-1" onClick={() => handleAction(req.id, 'accepted')}>Accept</Button>
+                                                <Button variant="outline-danger" size="sm" className="px-3 rounded-pill fw-bold flex-grow-1" onClick={() => handleAction(req.id, 'rejected')}>Reject</Button>
                                             </div>
                                         </div>
                                     </Card>
                                 ))
                             ) : (
-                                <div className="text-center py-5 bg-white rounded-4 shadow-sm">
-                                    <p className="text-muted mb-0">Abhi tak koi nayi request nahi aayi. Chill karein!</p>
+                                <div className="text-center py-5 bg-white rounded-4 shadow-sm border">
+                                    <p className="text-muted mb-0 small">Abhi tak koi nayi request nahi aayi.</p>
                                 </div>
                             )}
                         </div>
                     </Col>
                 </Row>
 
-                <Modal show={showMap} onHide={() => setShowMap(false)} centered size="lg">
+                <Modal show={showMap} onHide={() => setShowMap(false)} centered size="lg" fullscreen="sm-down">
                     <Modal.Header closeButton className="border-0">
-                        <Form className="w-100 me-3" onSubmit={handleMapSearch}>
+                        <Form className="w-100 me-2" onSubmit={handleMapSearch}>
                             <InputGroup>
                                 <Form.Control
                                     placeholder="Search location..."
@@ -273,7 +264,7 @@ const DriverDashboard = () => {
                         </Form>
                     </Modal.Header>
                     <Modal.Body className="p-0">
-                        <div style={{ height: '450px', width: '100%' }}>
+                        <div style={{ height: '60vh', minHeight: '300px', width: '100%' }}>
                             <MapContainer center={tempPos} zoom={13} style={{ height: '100%', width: '100%' }}>
                                 <ChangeView center={tempPos} />
                                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -282,9 +273,9 @@ const DriverDashboard = () => {
                             </MapContainer>
                         </div>
                     </Modal.Body>
-                    <Modal.Footer className="border-0">
-                        <Button variant="light" onClick={() => setShowMap(false)}>Cancel</Button>
-                        <Button variant="primary" className="px-4" onClick={handleConfirmLocation}>Confirm Location</Button>
+                    <Modal.Footer className="border-0 p-3">
+                        <Button variant="light" className="flex-grow-1" onClick={() => setShowMap(false)}>Cancel</Button>
+                        <Button variant="primary" className="px-4 flex-grow-1" onClick={handleConfirmLocation}>Confirm</Button>
                     </Modal.Footer>
                 </Modal>
             </Container>

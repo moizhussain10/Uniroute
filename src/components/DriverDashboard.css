@@ -107,3 +107,65 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     z-index: 1000;
     font-size: 0.8rem;
 }
+
+@media (max-width: 768px) {
+    .light-vibrant-bg{
+        margin-left: 280px;
+    }
+}
+
+/* 2. Mobile Specific (The real fixes) */
+@media (max-width: 576px) {
+    /* Main Dashboard Title */
+    h2 {
+        font-size: 1.5rem !important;
+        margin-bottom: 10px;
+    }
+
+    /* Route Selection Boxes (Pickup & Destination) */
+    .g-4 {
+        --bs-gutter-y: 1rem; /* Space between stacked boxes */
+    }
+    
+    .rounded-4 {
+        padding: 12px !important; /* Thori padding kam */
+    }
+
+    /* Form Fields - Mobile par har field full width */
+    .col-md-4 {
+        margin-bottom: 10px;
+    }
+
+    /* Incoming Request Cards */
+    .incoming-request-card {
+        padding: 15px !important;
+    }
+
+    /* Passenger Request details and buttons stack */
+    .d-flex.justify-content-between.align-items-center.flex-wrap {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .d-flex.gap-2 {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .d-flex.gap-2 button {
+        flex: 1; /* Accept/Reject buttons equal width */
+    }
+
+    /* Modal (Map Search) Fixes */
+    .modal-dialog {
+        margin: 10px;
+    }
+    
+    .modal-body div {
+        height: 350px !important; /* Mobile par map thora chota */
+    }
+
+    .modal-header .input-group {
+        width: 100% !important;
+    }
+}

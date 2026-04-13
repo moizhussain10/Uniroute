@@ -65,3 +65,30 @@
     border-color: #e91e63;
     background: #fce4ec;
 }
+
+/* Sidebar jab login ho (Desktop) */
+.main-content.with-sidebar {
+    margin-left: 280px; /* Sidebar ki width */
+    width: calc(100% - 280px);
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
+
+/* Signup/Login ke liye jab sidebar NA HO */
+.main-content.full-width {
+    margin-left: 0 !important;
+    width: 100% !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Mobile par hamesha full width */
+@media (max-width: 768px) {
+    .main-content.with-sidebar,
+    .main-content.full-width {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 10px;
+    }
+}

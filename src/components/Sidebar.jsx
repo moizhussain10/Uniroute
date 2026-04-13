@@ -1,57 +1,69 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaHome, FaSignOutAlt, FaCar, FaSearch, FaUserAlt } from 'react-icons/fa';
-import { auth } from '../config/firebase'; // Firebase auth import karein
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FaHome, FaSignOutAlt, FaCar, FaSearch, FaUserAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { auth } from '../config/firebase';
 import { signOut } from 'firebase/auth';
 import './Sidebar.css';
 
 const Sidebar = ({ role }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Asli logout function yahan hai
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Firebase se sign out
-      localStorage.clear(); // Safai zaroori hai
-      navigate('/login'); // Login page pe wapis
+      await signOut(auth);
+      localStorage.clear();
+      navigate('/login');
     } catch (error) {
       console.error("Logout error: ", error);
     }
   };
 
+  const isActive = (path) => location.pathname === path ? 'active' : '';
+
   return (
-    <div className="sidebar-container">
-      <div className="sidebar-logo">
-        <h3 className="fw-bold">Uni<span style={{color: '#007bff'}}>Route</span></h3>
+    <>
+      {/* Mobile Hamburger Toggle */}
+      <div className="hamburger-btn d-md-none" onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? <FaTimes /> : <FaBars />}
       </div>
-      
-      <nav className="sidebar-nav">
-        <Link to="/dashboard" className="nav-item">
-          <FaHome className="nav-icon" /> <span>Dashboard</span>
-        </Link>
+
+      {/* Dark Overlay for Mobile */}
+      {isOpen && <div className="sidebar-overlay d-md-none" onClick={() => setIsOpen(false)}></div>}
+
+      <div className={`sidebar-container ${isOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-logo">
+          <h3 className="fw-bold m-0">Uni<span style={{color: '#007bff'}}>Route</span></h3>
+        </div>
         
-        {role === 'driver' ? (
-          <Link to="/dashboard" className="nav-item">
-            <FaCar className="nav-icon" /> <span>Offer Ride</span>
+        <nav className="sidebar-nav">
+          <Link to="/dashboard" className={`nav-item ${isActive('/dashboard')}`} onClick={() => setIsOpen(false)}>
+            <FaHome className="nav-icon" /> <span>Dashboard</span>
           </Link>
-        ) : (
-          <Link to="/find-ride" className="nav-item">
-            <FaSearch className="nav-icon" /> <span>Find Ride</span>
+          
+          {role === 'driver' ? (
+            <Link to="/dashboard" className={`nav-item ${isActive('/dashboard')}`} onClick={() => setIsOpen(false)}>
+              <FaCar className="nav-icon" /> <span>Offer Ride</span>
+            </Link>
+          ) : (
+            <Link to="/find-ride" className={`nav-item ${isActive('/find-ride')}`} onClick={() => setIsOpen(false)}>
+              <FaSearch className="nav-icon" /> <span>Find Ride</span>
+            </Link>
+          )}
+
+          <Link to="/profile" className={`nav-item ${isActive('/profile')}`} onClick={() => setIsOpen(false)}>
+            <FaUserAlt className="nav-icon" /> <span>Profile</span>
           </Link>
-        )}
+        </nav>
 
-        <Link to="/profile" className="nav-item">
-          <FaUserAlt className="nav-icon" /> <span>My Profile</span>
-        </Link>
-      </nav>
-
-      <div className="sidebar-footer">
-        {/* Ab ye button upar wale handleLogout ko trigger karega */}
-        <button className="logout-btn w-100" onClick={handleLogout}>
-          <FaSignOutAlt className="nav-icon" /> Logout
-        </button>
+        <div className="sidebar-footer">
+          <button className="logout-btn w-100" onClick={handleLogout}>
+            <FaSignOutAlt className="nav-icon" /> Logout
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

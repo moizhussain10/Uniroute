@@ -111,7 +111,7 @@ const StudentDashboard = () => {
     <div className="dashboard-wrapper">
       <Container fluid className="py-4">
         
-        <div className="dashboard-header text-center mb-4">
+        <div className="dashboard-header d-flex text-center mb-4">
           <h3 className="fw-bold">Available Rides</h3>
           <p className="text-muted small">Karachi University Commute</p>
         </div>

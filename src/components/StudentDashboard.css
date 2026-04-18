@@ -1,6 +1,10 @@
 /* StudentDashboard.css */
 
 /* Desktop par sidebar ki wajah se margin (Router logic ke sath sync) */
+.dashboard-header{
+    justify-content: center;
+    flex-direction: column;
+}
 .dashboard-main-container {
     transition: all 0.3s ease;
 }

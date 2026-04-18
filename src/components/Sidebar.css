@@ -2,16 +2,16 @@
 .sidebar-container {
   width: 280px;
   height: 100vh;
-  position: fixed;
-  left: 0;
+  position: sticky;
+  /* Fixed ki jagah Sticky use karein desktop par */
   top: 0;
+  left: 0;
   background: #ffffff;
   border-right: 1px solid #eaeaea;
   display: flex;
   flex-direction: column;
   padding: 30px 20px;
   z-index: 1050;
-  transition: all 0.3s ease-in-out;
 }
 
 .sidebar-logo {
@@ -69,13 +69,13 @@
 /* --- MOBILE RESPONSIVE --- */
 @media (max-width: 768px) {
   .sidebar-container {
-    transform: translateX(-100%); /* Shuru mein hide */
-    width: 260px;
-    z-index: 2000;
+    position: fixed;
+    transform: translateX(-100%);
+    transition: 0.3s ease-in-out;
   }
 
   .sidebar-container.mobile-open {
-    transform: translateX(0); /* Toggle par show */
+    transform: translateX(0);
   }
 
   .hamburger-btn {
@@ -93,7 +93,7 @@
     border-radius: 8px;
     font-size: 1.3rem;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
   }
 
   .sidebar-overlay {
@@ -107,6 +107,7 @@
     z-index: 1999;
   }
 }
+
 .app-layout {
   display: flex;
   min-height: 100vh;
@@ -123,17 +124,20 @@
 /* Desktop par jab sidebar ho */
 @media (min-width: 769px) {
   .main-content.with-sidebar {
-    margin-left: 280px; /* Sirf baray screens par space choro */
+    margin-left: 280px;
+    /* Sirf baray screens par space choro */
   }
 }
 
 /* Mobile par space zero kardo */
 @media (max-width: 768px) {
   .main-content.with-sidebar {
-    margin-left: 0 !important; /* Mobile par space bilkul khatam */
-    padding-top: 60px; /* Hamburger button ke liye thori jagah */
+    margin-left: 0 !important;
+    /* Mobile par space bilkul khatam */
+    padding-top: 60px;
+    /* Hamburger button ke liye thori jagah */
   }
-  
+
   .main-content.full-width {
     margin-left: 0;
   }

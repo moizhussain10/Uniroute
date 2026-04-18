@@ -35,24 +35,28 @@ function Router() {
   return (
     <BrowserRouter>
       <div className="app-layout">
-        
-        {isuser && <Sidebar role={userRole} />}
+
+        {isuser && (
+          <div className="sidebar-wrapper " style={{ width: '280px' }}>
+            <Sidebar role={userRole} />
+          </div>
+        )}
 
         {/* Main Content Area */}
-        <div className={`main-content ${isuser ? 'with-sidebar' : 'full-width'}`}>
-          <Routes>
-            <Route path='/' element={isuser ? <Navigate to="/dashboard" /> : <Signup />} />
-            <Route path='/login' element={isuser ? <Navigate to="/dashboard" /> : <Login />} />
-            <Route path='/dashboard' element={isuser ? <Dashboard /> : <Navigate to="/login" />} />
-            <Route 
-              path='/profile' 
-              element={isuser ? (userRole === 'driver' ? <DriverProfile /> : <StudentProfile />) : <Navigate to="/login" />} 
-            />
-          </Routes>
+        <div className="d-md-none">
+          {isuser && <Sidebar role={userRole} />}
         </div>
-
+        <Routes>
+          <Route path='/' element={isuser ? <Navigate to="/dashboard" /> : <Signup />} />
+          <Route path='/login' element={isuser ? <Navigate to="/dashboard" /> : <Login />} />
+          <Route path='/dashboard' element={isuser ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route
+            path='/profile'
+            element={isuser ? (userRole === 'driver' ? <DriverProfile /> : <StudentProfile />) : <Navigate to="/login" />}
+          />
+        </Routes>
       </div>
-    </BrowserRouter>
+    </BrowserRouter >
   );
 }
 

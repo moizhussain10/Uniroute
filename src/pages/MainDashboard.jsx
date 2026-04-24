@@ -32,7 +32,7 @@ function MainDashboard() {
           <a href="#SERVICE" className="links hover:text-emerald-400 transition">SERVICE</a>
         </div>
         <div className="flex items-center gap-6">
-          <Link target='_blank' to={'./login'} className=" links text-m font-bold text-gray-300 text-white">Login</Link>
+          <Link target='_blank' to={'/login'} className=" links text-m font-bold text-gray-300 text-white">Login</Link>
           <Link target='_blank' to={'/signup'}>
           <button
             className=" signup_btn bg-emerald-500 text-black px-7 py-2.5 rounded-full font-bold text-sm btn-glow transition-all">Get

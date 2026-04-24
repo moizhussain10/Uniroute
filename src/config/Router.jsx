@@ -33,7 +33,6 @@ function Router() {
 
   return (
     <BrowserRouter>
-<<<<<<< HEAD
       {/* Ab poora content area full width hoga kyunke sidebar Dashboard page ke andar move ho gaya hai */}
       <div className="min-h-screen bg-[#020202] text-white">
         <main className="w-full min-h-screen">
@@ -62,29 +61,6 @@ function Router() {
             <Route path="*" element={<Navigate to={isuser ? "/dashboard" : "/"} />} />
           </Routes>
         </main>
-=======
-      <div className="app-layout">
-
-        {isuser && (
-          <div className="sidebar-wrapper " style={{ width: '280px' }}>
-            <Sidebar role={userRole} />
-          </div>
-        )}
-
-        {/* Main Content Area */}
-        <div className="d-md-none">
-          {isuser && <Sidebar role={userRole} />}
-        </div>
-        <Routes>
-          <Route path='/' element={isuser ? <Navigate to="/dashboard" /> : <Signup />} />
-          <Route path='/login' element={isuser ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path='/dashboard' element={isuser ? <Dashboard /> : <Navigate to="/login" />} />
-          <Route
-            path='/profile'
-            element={isuser ? (userRole === 'driver' ? <DriverProfile /> : <StudentProfile />) : <Navigate to="/login" />}
-          />
-        </Routes>
->>>>>>> 1a238145593ae4fd67ed31bd65ba15a4aa53ef9b
       </div>
     </BrowserRouter >
   );

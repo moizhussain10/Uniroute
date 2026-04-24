@@ -218,7 +218,6 @@ const calculateFare = (pickupCoords, destCoords) => {
   );
 
   return (
-<<<<<<< HEAD
     <div className="student-dashboard-main">
       <Container className="py-4">
         {/* Header Section */}
@@ -234,14 +233,6 @@ const calculateFare = (pickupCoords, destCoords) => {
               <FaWallet className="me-2" /> Rs. 1,250
             </div>
           </div>
-=======
-    <div className="dashboard-wrapper">
-      <Container fluid className="py-4">
-        
-        <div className="dashboard-header d-flex text-center mb-4">
-          <h3 className="fw-bold">Available Rides</h3>
-          <p className="text-muted small">Karachi University Commute</p>
->>>>>>> 1a238145593ae4fd67ed31bd65ba15a4aa53ef9b
         </div>
 
         {/* Quick Stats */}

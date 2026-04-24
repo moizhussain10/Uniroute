@@ -53,3 +53,40 @@
         padding-top: 80px; /* Hamburger button ke liye space */
     }
 }
+
+.app-layout {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    background-color: #f8f9fa !important;
+}
+
+/* Sidebar wrapper jo desktop par jagah gheray ga */
+.sidebar-wrapper {
+    width: 280px !important;
+    flex-shrink: 0 !important;
+    background: #fff !important;
+    border-right: 1px solid #eee !important;
+}
+
+.main-content {
+    flex-grow: 1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Content ke darmiyan koi faltu margin na ho */
+.main-content.with-sidebar {
+    margin-left: 0 !important; 
+    padding: 20px !important;
+}
+
+@media (max-width: 768px) {
+    .sidebar-wrapper {
+        display: none !important;
+    }
+    .main-content.with-sidebar {
+        padding-top: 80px !important;
+    }
+}

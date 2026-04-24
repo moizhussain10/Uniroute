@@ -1,5 +1,6 @@
 /* Sidebar Container */
 .sidebar-container {
+<<<<<<< HEAD
     background: rgba(15, 15, 15, 0.85); /* Darker glass for contrast */
     backdrop-filter: blur(20px);
     border-right: 1px solid rgba(157, 255, 80, 0.2);
@@ -13,6 +14,20 @@
     top: 0;
     z-index: 2000;
     transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+=======
+  width: 280px;
+  height: 100vh;
+  position: sticky;
+  /* Fixed ki jagah Sticky use karein desktop par */
+  top: 0;
+  left: 0;
+  background: #ffffff;
+  border-right: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+  z-index: 1050;
+>>>>>>> 1a238145593ae4fd67ed31bd65ba15a4aa53ef9b
 }
 
 /* Logo Section */
@@ -85,6 +100,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+<<<<<<< HEAD
 .logout-btn-neon {
     background: rgba(255, 75, 75, 0.1);
     border: 1px solid rgba(255, 75, 75, 0.2);
@@ -92,14 +108,47 @@
     padding: 12px;
     border-radius: 12px;
     width: 100%;
+=======
+.logout-btn:hover {
+  background: #ff4d4d;
+  color: white;
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 768px) {
+  .sidebar-container {
+    position: fixed;
+    transform: translateX(-100%);
+    transition: 0.3s ease-in-out;
+  }
+
+  .sidebar-container.mobile-open {
+    transform: translateX(0);
+  }
+
+  .hamburger-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 2100;
+    background: #007bff;
+    color: white;
+    width: 42px;
+    height: 42px;
+>>>>>>> 1a238145593ae4fd67ed31bd65ba15a4aa53ef9b
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     cursor: pointer;
+<<<<<<< HEAD
     transition: 0.3s;
     font-weight: 600;
 }
+=======
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+  }
+>>>>>>> 1a238145593ae4fd67ed31bd65ba15a4aa53ef9b
 
 .logout-btn-neon:hover {
     background: #ff4b4b;
@@ -135,6 +184,16 @@
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
     z-index: 1999;
+<<<<<<< HEAD
+=======
+  }
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+>>>>>>> 1a238145593ae4fd67ed31bd65ba15a4aa53ef9b
 }
 
 /* --- Responsive Breakpoints --- */
@@ -154,6 +213,7 @@
     }
 }
 
+<<<<<<< HEAD
 @media (min-width: 993px) {
     /* Body par padding ya margin BILKUL nahi hona chahiye */
     body {
@@ -175,4 +235,26 @@
         margin-left: 0;
         width: 100%;
     }
+=======
+/* Desktop par jab sidebar ho */
+@media (min-width: 769px) {
+  .main-content.with-sidebar {
+    margin-left: 280px;
+    /* Sirf baray screens par space choro */
+  }
+}
+
+/* Mobile par space zero kardo */
+@media (max-width: 768px) {
+  .main-content.with-sidebar {
+    margin-left: 0 !important;
+    /* Mobile par space bilkul khatam */
+    padding-top: 60px;
+    /* Hamburger button ke liye thori jagah */
+  }
+
+  .main-content.full-width {
+    margin-left: 0;
+  }
+>>>>>>> 1a238145593ae4fd67ed31bd65ba15a4aa53ef9b
 }

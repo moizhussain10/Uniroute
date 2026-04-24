@@ -1,8 +1,20 @@
+<<<<<<< HEAD
 .student-dashboard-main {
     background-color: #000;
     min-height: 100vh;
     color: white;
     padding-bottom: 80px;
+=======
+/* StudentDashboard.css */
+
+/* Desktop par sidebar ki wajah se margin (Router logic ke sath sync) */
+.dashboard-header{
+    justify-content: center;
+    flex-direction: column;
+}
+.dashboard-main-container {
+    transition: all 0.3s ease;
+>>>>>>> 1a238145593ae4fd67ed31bd65ba15a4aa53ef9b
 }
 
 /* Welcome Header */

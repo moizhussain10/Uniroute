@@ -4,6 +4,7 @@
     color: white;
 }
 
+<<<<<<< HEAD
 .loader-container {
     height: 80vh;
     display: flex;
@@ -146,3 +147,106 @@
 }
 
 .letter-spacing-1 { letter-spacing: 1.5px; }
+=======
+.profile-main-wrapper {
+    min-height: 100vh;
+    background: #f1f3f6 !important; /* Thora darker background taake cards pop karein */
+}
+
+.profile-sidebar-card, .history-main-card {
+    border-radius: 30px !important;
+    transition: transform 0.3s ease;
+}
+
+/* Sidebar Specifics */
+.avatar-wrapper {
+    background: #e7f0ff;
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto;
+    border: 5px solid white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.detail-icon-bg {
+    width: 35px;
+    height: 35px;
+    background: white;
+    color: #0d6efd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+/* History Items */
+.ride-history-item {
+    border: 1px solid #eef2f7 !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.shadow-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.08) !important;
+    border-color: #0d6efd !important;
+}
+
+.history-header-icon {
+    background: #0d6efd;
+    color: white;
+    padding: 12px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+}
+
+/* Icon Wrappers for Location */
+.loc-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.loc-icon-wrapper.pickup { background: #e0f7fa; color: #00bcd4; }
+.loc-icon-wrapper.destination { background: #ffebee; color: #f44336; }
+
+.address-text {
+    line-height: 1.4;
+    display: block;
+    margin-top: 2px;
+}
+
+.fw-600 { font-weight: 600; }
+.fw-extrabold { font-weight: 800; }
+.transition-3s { transition: all 0.3s ease; }
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .profile-sidebar-card {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .history-main-card {
+        padding: 20px !important;
+    }
+    
+    .address-text {
+        font-size: 0.9rem !important;
+    }
+
+    .fare-display h4 {
+        font-size: 1.25rem !important;
+    }
+}
+>>>>>>> 1a238145593ae4fd67ed31bd65ba15a4aa53ef9b

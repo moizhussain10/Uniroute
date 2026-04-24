@@ -1,103 +1,180 @@
-/* StudentDashboard.css */
-
-/* Desktop par sidebar ki wajah se margin (Router logic ke sath sync) */
-.dashboard-main-container {
-    transition: all 0.3s ease;
+.student-dashboard-main {
+    background-color: #000;
+    min-height: 100vh;
+    color: white;
+    padding-bottom: 80px;
 }
 
-/* Card Improvements */
-.ride-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid #f0f0f0 !important;
+/* Welcome Header */
+.neon-text-student {
+    color: #9dff50;
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
-.ride-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+.wallet-badge {
+    background: rgba(157, 255, 80, 0.1);
+    border: 1px solid #9dff50;
+    color: #9dff50;
+    padding: 8px 15px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
 }
 
-/* Timeline vertical line logic */
-.route-line {
-    position: absolute;
-    width: 2px;
-    height: 35px;
-    background: #e9ecef;
-    left: 7px;
-    top: 18px;
-    z-index: 1;
+/* Mini Stats */
+.mini-stat-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 18px;
+    text-align: left;
 }
 
-/* Mobile Responsive Fixes */
-@media (max-width: 768px) {
-    .dashboard-header h3 {
-        font-size: 1.5rem;
-    }
-    
-    .search-group {
-        width: 100% !important;
-        margin-bottom: 20px;
-    }
+.stat-icon { color: #9dff50; margin-bottom: 10px; font-size: 20px; }
+.mini-stat-card span { color: #666; font-size: 11px; text-transform: uppercase; display: block; }
+.mini-stat-card h5 { margin: 0; font-weight: 700; }
 
-    .ride-card-body {
-        padding: 15px !important;
-    }
-
-    /* Taake buttons ek ke niche ek na aayein, gap barabar rahe */
-    .action-buttons-gap {
-        gap: 8px !important;
-    }
-
-    /* Bottom spacing for mobile navigation nav bar */
-    .dashboard-main-container {
-        padding-bottom: 100px !important;
-    }
+/* Neon Search */
+.neon-search-group {
+    background: #111 !important;
+    border: 1px solid #333;
+    border-radius: 15px !important;
+    overflow: hidden;
+    transition: 0.3s;
 }
 
-@media (max-width: 480px) {
-    .ride-card h6 {
-        font-size: 0.95rem;
-    }
-    .nav-icon-adjust {
-        font-size: 1rem !important;
-    }
+.neon-search-group:focus-within {
+    border-color: #9dff50;
+    box-shadow: 0 0 15px rgba(157, 255, 80, 0.2);
 }
 
-/* Sidebar.css ke niche ye add karein */
-
-/* Desktop Fix */
-@media (min-width: 769px) {
-  .dashboard-main-container, 
-  .profile-container, 
-  .main-content {
-    margin-left: 280px !important; /* Sidebar ki jagah pakki */
-    width: calc(100% - 280px) !important;
-  }
-}
-
-/* Mobile Fix (The "Bura lag raha hai" Solver) */
-@media (max-width: 768px) {
-  .dashboard-main-container, 
-  .profile-container, 
-  .main-content {
-    margin-left: 0 !important; /* Mobile pe koi margin nahi */
-    padding-left: 15px !important;
-    padding-right: 15px !important;
-    width: 100% !important;
-  }
-
-  /* Cards ko mobile pe full width karne ke liye */
-  .row {
-    margin-right: 0 !important;
-    margin-left: 0 !important;
-  }
-  
-  .col-12 {
-    padding-left: 5px !important;
-    padding-right: 5px !important;
-  }
-
-  /* Card ke andar ka text responsive */
-  .ride-card-body {
+.neon-search-group input {
+    background: transparent !important;
+    color: white !important;
+    border: none !important;
     padding: 12px !important;
-  }
+}
+
+.neon-search-group span {
+    background: transparent !important;
+    border: none !important;
+    color: #9dff50;
+}
+
+/* Glass Ride Card */
+.glass-ride-card {
+    background: rgba(255,255,255,0.02) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 24px !important;
+    transition: 0.3s;
+}
+
+.glass-ride-card:hover {
+    transform: translateY(-8px);
+    border-color: #9dff50 !important;
+    box-shadow: 0 10px 30px rgba(157, 255, 80, 0.1);
+}
+
+.driver-avatar-ring {
+    width: 45px;
+    height: 45px;
+    background: #111;
+    border: 2px solid #9dff50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9dff50;
+}
+
+.rating-box {
+    font-size: 11px;
+    color: #ffc107;
+}
+
+.live-pill {
+    background: rgba(157, 255, 80, 0.1) !important;
+    color: #9dff50 !important;
+    border: 1px solid #9dff50;
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+/* Route Flow Logic */
+.route-flow {
+    position: relative;
+    padding-left: 25px;
+    margin: 20px 0;
+}
+
+.flow-line {
+    position: absolute;
+    left: 4px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: linear-gradient(to bottom, #9dff50, #333);
+}
+
+.flow-dot {
+    position: absolute;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    z-index: 2;
+}
+.flow-dot.start { top: 0; background: #9dff50; box-shadow: 0 0 10px #9dff50; }
+.flow-dot.end { bottom: 0; background: #555; }
+
+.flow-item small { color: #555; font-size: 10px; font-weight: 700; }
+.flow-item p { margin: 0; font-size: 14px; font-weight: 500; color: #ddd; }
+
+/* Fare Footer */
+.fare-info small { color: #666; font-size: 10px; }
+.fare-info h4 { color: white; margin: 0; font-weight: 800; }
+
+.btn-request-neon {
+    background: #9dff50 !important;
+    color: #000 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 10px 20px !important;
+    font-weight: 900 !important;
+    font-size: 12px !important;
+    transition: 0.3s;
+}
+
+.btn-request-neon:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(157, 255, 80, 0.4);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+}
+.empty-state img { width: 100px; opacity: 0.3; margin-bottom: 20px; filter: grayscale(1); }
+.empty-state h4 { color: #555; }
+
+/* Section Label */
+.section-label {
+    color: #555;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+/* Instructions panel ko screen se bahar nikalne aur hide karne ke liye */
+.leaflet-routing-container {
+    display: none !important;
+}
+
+/* Map par clicks ko allow karne ke liye agar koi invisible layer reh jaye */
+.leaflet-top, .leaflet-bottom {
+    z-index: 800 !important;
 }

@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Badge, ListGroup, Spinner, Button } from 'react-bootstrap';
-import { FaUserCircle, FaEnvelope, FaHistory, FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaUserCircle, FaEnvelope, FaHistory, FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaClock, FaMapMarkerAlt, FaPhoneAlt, FaEdit } from 'react-icons/fa';
 import { auth, db } from '../config/firebase';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import './StudentProfile.css'; // CSS Import zaroor karein
+import { collection, query, where, onSnapshot, orderBy, doc, getDoc } from 'firebase/firestore';
+import './StudentProfile.css';
 
 const StudentProfile = () => {
-    const [user, setUser] = useState(null);
+    const [userData, setUserData] = useState(null);
     const [myRequests, setMyRequests] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const currentUser = auth.currentUser;
         if (currentUser) {
-            setUser(currentUser);
+            // Dono data fetch hone ka track rakhne ke liye
+            const fetchProfile = async () => {
+                const docSnap = await getDoc(doc(db, "users", currentUser.uid));
+                if (docSnap.exists()) {
+                    setUserData(docSnap.data());
+                }
+            };
+
             const q = query(
                 collection(db, "requests"),
                 where("passengerId", "==", currentUser.uid),
@@ -26,108 +33,125 @@ const StudentProfile = () => {
                     ...doc.data()
                 }));
                 setMyRequests(reqData);
-                setLoading(false);
+
+                // Profile fetch hone ke baad hi loading khatam karein
+                fetchProfile().then(() => setLoading(false));
             });
+
             return () => unsubscribe();
         }
     }, []);
 
     const getStatusBadge = (status) => {
-        const commonClass = "rounded-pill px-3 status-badge";
+        const commonClass = "rounded-pill px-3 py-2 status-badge-neon fw-bold";
         switch (status) {
-            case 'accepted': return <Badge bg="success" className={commonClass}><FaCheckCircle className="me-1"/> Accepted</Badge>;
-            case 'rejected': return <Badge bg="danger" className={commonClass}><FaTimesCircle className="me-1"/> Rejected</Badge>;
-            case 'expired': return <Badge bg="secondary" className={commonClass}><FaClock className="me-1"/> Expired</Badge>;
-            default: return <Badge bg="warning" text="dark" className={commonClass}><FaClock className="me-1"/> Pending</Badge>;
+            case 'accepted': return <Badge className={`${commonClass} bg-neon-success`}><FaCheckCircle className="me-1" /> Accepted</Badge>;
+            case 'rejected': return <Badge className={`${commonClass} bg-neon-danger`}><FaTimesCircle className="me-1" /> Rejected</Badge>;
+            default: return <Badge className={`${commonClass} bg-neon-warning`}><FaClock className="me-1" /> Pending</Badge>;
         }
     };
 
     if (loading) return (
-        <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
-            <Spinner animation="grow" variant="primary" />
+        <div className="loader-container">
+            <Spinner animation="border" style={{ color: '#9dff50' }} />
         </div>
     );
 
     return (
-        <div className="py-4 py-md-5" style={{ minHeight: '100vh', background: '#f8f9fa' }}>
-            <Container className="profile-container">
-                <Row className="justify-content-center">
-                    
-                    {/* Sidebar: Profile Info */}
-                    <Col xs={12} lg={4} className="user-info-card mb-4">
-                        <Card className="border-0 shadow-sm text-center p-4 h-100" style={{ borderRadius: '25px' }}>
-                            <div className="mb-3">
-                                <FaUserCircle size={80} className="text-primary opacity-75" />
+        <div className="student-profile-main">
+            <Container className="py-5">
+                <Row className="g-4">
+                    {/* --- Profile Sidebar (Neon Glass) --- */}
+                    <Col xs={12} lg={4}>
+                        <div className="neon-profile-card text-center">
+                            <div className="avatar-section mb-4">
+                                <div className="neon-avatar-ring">
+                                    <FaUserCircle size={90} color="#9dff50" />
+                                </div>
                             </div>
-                            <h4 className="fw-bold mb-1" style={{ fontSize: '1.25rem' }}>{user?.displayName || "Student Name"}</h4>
-                            <p className="text-muted small mb-3">Aptech Passenger</p>
-                            <hr className="opacity-50" />
-                            <div className="text-start mt-3">
-                                <p className="mb-2 text-truncate" style={{ fontSize: '0.85rem' }}>
-                                    <FaEnvelope className="me-2 text-primary"/> {user?.email}
-                                </p>
-                                <p className="mb-0 small">
-                                    <FaCalendarAlt className="me-2 text-primary"/> 
-                                    Joined: {user?.metadata.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString() : 'N/A'}
-                                </p>
+                            <h3 className="neon-text-green fw-bold mb-1">
+                                {userData?.name || auth.currentUser?.displayName || "Student"}
+                            </h3>
+                            <p className="text-muted small letter-spacing-1 mb-4 text-uppercase">Member Pass #8291</p>
+
+                            <div className="profile-info-list text-start mb-4">
+                                <div className="info-item">
+                                    <FaEnvelope className="neon-icon-sm" />
+                                    <div>
+                                        <small className="d-block text-muted">EMAIL</small>
+                                        <span className="text-white small">{auth.currentUser?.email}</span>
+                                    </div>
+                                </div>
+                                <div className="info-item mt-3">
+                                    <FaEnvelope className="neon-icon-sm" />
+                                    <div>
+                                        <small className="d-block text-muted">Phone Number</small>
+                                        <span className="text-white small">{userData.phone}</span>
+                                    </div>
+                                </div>
+                                <div className="info-item mt-3">
+                                    <FaCalendarAlt className="neon-icon-sm" />
+                                    <div>
+                                        <small className="d-block text-muted">JOINED</small>
+                                        <span className="text-white small">
+                                            {auth.currentUser?.metadata.creationTime ? new Date(auth.currentUser.metadata.creationTime).toLocaleDateString('en-GB') : 'N/A'}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <Button variant="outline-primary" size="sm" className="mt-4 rounded-pill w-100 fw-bold">Edit Profile</Button>
-                        </Card>
+
+                            <Button className="btn-neon-outline w-100 py-3">
+                                <FaEdit className="me-2" /> EDIT PROFILE
+                            </Button>
+                        </div>
                     </Col>
 
-                    {/* Main Content: Requests History */}
+                    {/* --- History Section --- */}
                     <Col xs={12} lg={8}>
-                        <Card className="border-0 shadow-sm p-3 p-md-4" style={{ borderRadius: '25px' }}>
-                            <div className="d-flex align-items-center mb-4">
-                                <div className="bg-primary text-white p-2 rounded-3 me-3 d-flex align-items-center">
-                                    <FaHistory size={18} />
-                                </div>
-                                <h5 className="fw-bold mb-0">Ride History</h5>
-                            </div>
+                        <div className="history-header d-flex justify-content-between align-items-center mb-4">
+                            <h4 className="neon-text-green mb-0 fw-bold"><FaHistory className="me-2" /> RIDE HISTORY</h4>
+                            <Badge className="total-badge">Total Trips: {myRequests.length}</Badge>
+                        </div>
 
-                            {myRequests.length > 0 ? (
-                                <ListGroup variant="flush">
-                                    {myRequests.map((req) => (
-                                        <ListGroup.Item key={req.id} className="border-0 px-0 mb-3">
-                                            <div className="request-item-inner p-3 border rounded-4 bg-white shadow-sm hover-shadow">
-                                                <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2">
-                                                    <div className="w-100">
-                                                        <div className="d-flex align-items-start gap-2 mb-2">
-                                                            <FaMapMarkerAlt className="text-info mt-1" size={14} />
-                                                            <span className="fw-bold text-dark small location-text">{req.pickup}</span>
+                        {myRequests.length > 0 ? (
+                            <div className="history-stack">
+                                {myRequests.map((req) => (
+                                    <div key={req.id} className="history-neon-item">
+                                        <div className="p-4">
+                                            <Row className="align-items-center">
+                                                <Col md={8}>
+                                                    <div className="route-display">
+                                                        <div className="route-point">
+                                                            <div className="dot green"></div>
+                                                            <p className="address-text m-0">{req.pickup}</p>
                                                         </div>
-                                                        <div className="d-flex align-items-start gap-2">
-                                                            <FaMapMarkerAlt className="text-danger mt-1" size={14} />
-                                                            <span className="fw-bold text-dark small location-text">{req.destination}</span>
+                                                        <div className="route-line-neon"></div>
+                                                        <div className="route-point">
+                                                            <div className="dot red"></div>
+                                                            <p className="address-text m-0">{req.destination}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="mt-2 mt-sm-0">
-                                                        {getStatusBadge(req.status)}
-                                                    </div>
-                                                </div>
-                                                
-                                                <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                                                    <small className="text-muted" style={{ fontSize: '0.7rem' }}>
-                                                        {req.createdAt?.toDate() ? req.createdAt.toDate().toLocaleDateString('en-GB') : 'Just now'}
-                                                    </small>
-                                                    <div className="d-flex gap-2">
-                                                        <span className="fw-bold text-primary small">Rs. {req.fare}</span>
-                                                        {req.status === 'accepted' && (
-                                                            <Badge bg="info" className="text-white small" style={{ cursor: 'pointer' }}>Call</Badge>
-                                                        )}
-                                                    </div>
-                                                </div>
+                                                </Col>
+                                                <Col md={4} className="text-md-end mt-3 mt-md-0">
+                                                    <div className="mb-2">{getStatusBadge(req.status)}</div>
+                                                    <h4 className="fare-text mb-0">Rs. {req.fare}</h4>
+                                                </Col>
+                                            </Row>
+                                            <div className="item-footer mt-3 pt-3 border-top-dark d-flex justify-content-between">
+                                                <span className="text-muted small">ID: #{req.id.slice(0, 8).toUpperCase()}</span>
+                                                <span className="text-muted small">
+                                                    {req.createdAt?.toDate() ? req.createdAt.toDate().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : 'Processing...'}
+                                                </span>
                                             </div>
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                            ) : (
-                                <div className="text-center py-5">
-                                    <img src="https://illustrations.popsy.co/flat/empty-state.svg" alt="no-data" style={{ width: '120px', opacity: 0.6 }} className="mb-3" />
-                                    <p className="text-muted small">No ride requests found in your history.</p>
-                                </div>
-                            )}
-                        </Card>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="empty-neon-state">
+                                <p className="text-muted">No ride history found yet.</p>
+                            </div>
+                        )}
                     </Col>
                 </Row>
             </Container>

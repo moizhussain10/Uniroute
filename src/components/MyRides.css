@@ -1,0 +1,90 @@
+.my-rides-wrapper {
+    min-height: 100vh;
+    background-color: #0a0a0a;
+    color: white;
+}
+
+.loader-box {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.neon-text-green {
+    color: #9dff50;
+    text-shadow: 0 0 10px rgba(157, 255, 80, 0.3);
+}
+
+.ride-count-badge {
+    background: #9dff50 !important;
+    color: black !important;
+    padding: 10px 20px !important;
+    border-radius: 10px !important;
+    font-weight: bold !important;
+}
+
+/* Card Styling */
+.ride-manage-card {
+    background: rgba(25, 25, 25, 0.8) !important;
+    border: 1px solid rgba(157, 255, 80, 0.1) !important;
+    border-radius: 20px !important;
+    transition: all 0.3s ease;
+}
+
+.ride-manage-card:hover {
+    border-color: #9dff50 !important;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Route Visualization */
+.route-visual-neon {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.point {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.address {
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.connecting-line {
+    width: 2px;
+    height: 15px;
+    background: rgba(157, 255, 80, 0.2);
+    margin-left: 7px;
+}
+
+.ride-meta {
+    font-size: 0.85rem;
+    color: #eee;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 5px 12px;
+    border-radius: 8px;
+}
+
+/* Delete Button */
+.btn-delete-neon {
+    border-radius: 10px !important;
+    padding: 8px 15px !important;
+    transition: 0.3s;
+}
+
+.btn-delete-neon:hover {
+    background: #dc3545 !important;
+    color: white !important;
+    box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
+}
+
+.empty-state-neon {
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+}

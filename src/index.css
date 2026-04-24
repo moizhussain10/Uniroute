@@ -1,94 +1,55 @@
-/* Light Background with a soft touch */
-.light-vibrant-bg {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Global Layout Rules --- */
+
+.dashboard-main-content {
+    flex: 1;
     min-height: 100vh;
-    color: #333;
+    background: #000;
+    padding: 20px; /* Thora sa inner gap taake cards touch na hon */
 }
 
-/* White Glassmorphism Card */
-.glass-card-light {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+/* Parent Wrapper */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #000;
 }
 
-/* Text Colors for Light Theme */
-.text-vibrant-pink {
-    color: #d81b60;
-    font-weight: 800;
+/* Main Content (Dashboard ke liye) */
+.main-content-wrapper {
+    flex: 1;
+    width: calc(100% - 260px);
+    min-height: 100vh;
 }
 
-.text-light-muted {
-    color: #666 !important;
-}
+/* --- Login/Signup Page Fix --- */
+/* Agar page login hai, toh wahan sidebar nahi hota, 
+   isliye margin-left zero hona chahiye. */
 
-/* Inputs for Light Theme */
-.light-input {
-    background: white !important;
-    border: 2px solid #eee !important;
-    color: #333 !important;
-    border-radius: 10px !important;
-    padding: 12px !important;
-}
-
-.light-input:focus {
-    border-color: #007bff !important;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.1) !important;
-}
-
-/* Location Boxes in Light Mode */
-.location-box-light {
-    border: 2px solid #e0e0e0;
-    border-radius: 15px;
-    padding: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-    background: white;
+.login-container, .signup-container {
+    width: 100vw;
+    height: 100vh;
+    position: fixed; /* Poori screen gher le */
+    top: 0;
+    left: 0;
+    z-index: 3000; /* Sidebar se upar aajaye */
+    background: #000;
     display: flex;
     align-items: center;
-    gap: 15px;
+    justify-content: center;
 }
 
-.location-box-light:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-
-.location-box-light.active-pickup {
-    border-color: #00bcd4;
-    background: #e0f7fa;
-}
-
-.location-box-light.active-dest {
-    border-color: #e91e63;
-    background: #fce4ec;
-}
-
-/* Sidebar jab login ho (Desktop) */
-.main-content.with-sidebar {
-    margin-left: 280px; /* Sidebar ki width */
-    width: calc(100% - 280px);
-    min-height: 100vh;
-    transition: all 0.3s ease;
-}
-
-/* Signup/Login ke liye jab sidebar NA HO */
-.main-content.full-width {
-    margin-left: 0 !important;
-    width: 100% !important;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Mobile par hamesha full width */
-@media (max-width: 768px) {
-    .main-content.with-sidebar,
-    .main-content.full-width {
-        margin-left: 0 !important;
-        width: 100% !important;
-        padding: 10px;
+@media (max-width: 992px) {
+    .dashboard-main-content {
+        margin-left: 0;
+        width: 100%;
+        padding-top: 80px; /* Hamburger button ke liye space */
     }
 }

@@ -1,0 +1,236 @@
+/* ActiveTrip.css */
+
+:root {
+    --neon-green: #9dff50;
+    --dark-bg: #050505;
+    --card-bg: rgba(20, 20, 20, 0.9);
+    --border-glow: rgba(157, 255, 80, 0.2);
+    --text-muted: #888;
+}
+
+.active-trip-page {
+    background: var(--dark-bg);
+    min-height: 100vh;
+    color: white;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Map Section */
+.map-holder-neon {
+    height: 450px;
+    border-radius: 25px;
+    overflow: hidden;
+    border: 1px solid var(--border-glow);
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+@media (min-width: 992px) {
+    .map-holder-neon { height: 600px; }
+}
+
+.live-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--neon-green);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border: 1px solid var(--neon-green);
+    letter-spacing: 1px;
+}
+
+/* Info Card / Sidebar */
+.info-card-neon {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 25px;
+    border: 1px solid var(--border-glow);
+    height: 100%;
+    box-shadow: 0 0 30px rgba(157, 255, 80, 0.05);
+}
+
+.neon-title {
+    color: var(--neon-green);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    text-shadow: 0 0 15px rgba(157, 255, 80, 0.3);
+}
+
+/* Profile Box Fixes */
+.profile-mini-box {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.avatar-frame img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 2px solid var(--neon-green);
+    padding: 2px;
+}
+
+.call-neon-btn {
+    background: var(--neon-green);
+    color: black;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: 0 0 15px rgba(157, 255, 80, 0.3);
+}
+
+.call-neon-btn:hover {
+    transform: scale(1.1);
+    background: #ffffff;
+}
+
+/* Timeline */
+.route-timeline {
+    position: relative;
+    padding-left: 5px;
+}
+
+.timeline-point {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 5px;
+}
+
+.timeline-point label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.timeline-point p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    color: #e0e0e0;
+}
+
+.timeline-line {
+    width: 2px;
+    height: 35px;
+    background: linear-gradient(to bottom, var(--neon-green), #ff4d4d);
+    margin-left: 9px;
+    opacity: 0.4;
+}
+
+/* Fare Box */
+.fare-neon-box {
+    background: rgba(157, 255, 80, 0.07);
+    border: 1px dashed var(--neon-green);
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.text-neon {
+    color: var(--neon-green) !important;
+    text-shadow: 0 0 10px rgba(157, 255, 80, 0.5);
+}
+
+/* Action Buttons */
+.btn-complete-trip {
+    background: var(--neon-green);
+    color: black;
+    font-weight: 800;
+    border-radius: 15px;
+    padding: 15px;
+    border: none;
+    transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-complete-trip:hover {
+    box-shadow: 0 0 25px rgba(157, 255, 80, 0.5);
+    transform: translateY(-3px);
+}
+
+.btn-cancel-trip {
+    background: rgba(255, 77, 77, 0.1);
+    border: 1px solid rgba(255, 77, 77, 0.3);
+    color: #ff4d4d;
+    padding: 14px;
+    border-radius: 15px;
+    font-weight: 700;
+    transition: 0.3s;
+}
+
+.btn-cancel-trip:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
+/* Animations */
+.pulse-dot {
+    height: 10px;
+    width: 10px;
+    background-color: var(--neon-green);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+    animation: pulse-animation 1.5s infinite;
+}
+
+@keyframes pulse-animation {
+    0% { box-shadow: 0 0 0 0px rgba(157, 255, 80, 0.7); }
+    100% { box-shadow: 0 0 0 12px rgba(157, 255, 80, 0); }
+}
+
+/* Leaflet Map Fixes */
+.leaflet-container {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+/* Number ko chamkane ke liye */
+.profile-mini-box .ms-3 div {
+    color: var(--neon-green) !important;
+    text-shadow: 0 0 8px rgba(157, 255, 80, 0.4);
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+/* Map error state fix */
+.map-error-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    color: var(--neon-green);
+}
+
+/* Scrollbar styling for sidebar */
+.info-card-neon {
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+.info-card-neon::-webkit-scrollbar {
+    width: 4px;
+}
+
+.info-card-neon::-webkit-scrollbar-thumb {
+    background: var(--neon-green);
+    border-radius: 10px;
+}

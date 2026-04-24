@@ -1,106 +1,183 @@
-/* --- APKA ORIGINAL CODE START --- */
-.light-vibrant-bg {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+/* Poore page ka background aur font set karne ke liye */
+
+
+
+.auth-container {
+    background-image: linear-gradient(rgba(30, 24, 24, 0.9), rgba(0, 0, 0, 0.9)),
+        url('https://static.vecteezy.com/system/resources/thumbnails/053/733/164/small/perfect-close-up-of-a-modern-car-showcasing-its-intricate-design-photo.jpg');
+    /* Image ko pure section par cover karne ke liye */
+    background-size: cover;
+    /* Image ko center karne ke liye */
+    background-position: center;
+    /* Image repeat na ho */
+    background-repeat: no-repeat;
     min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Form ki width aur spacing */
+.auth-card {
     width: 100%;
+    max-width: 400px;
+    text-align: left;
 }
 
-.glass-card-light {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #333;
-    transition: 0.3s ease;
+/* Header section styling */
+.auth-header {
+    text-align: center;
+    margin-bottom: 40px;
 }
 
-.glass-card-light:hover {
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
+.auth-header h2 {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
-.light-input {
-    background: #ffffff !important;
-    border: 2px solid #e0e6ed !important;
-    color: #333 !important;
-    border-radius: 10px !important;
-    padding: 12px 15px !important;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
+.auth-header p {
+    color: #666666;
+    font-size: 14px;
 }
 
-.light-input:focus {
-    border-color: #007bff !important;
-    box-shadow: 0 0 15px rgba(0, 123, 255, 0.1) !important;
+/* Input groups aur labels */
+.form-group {
+    margin-bottom: 24px;
 }
 
-.input-group-text {
-    background: #ffffff !important;
-    border: 2px solid #e0e6ed !important;
-    border-radius: 10px 0 0 10px !important;
-    color: #007bff !important;
-    font-size: 1.1rem;
+.form-group label {
+    display: block;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    margin-left: 4px;
 }
 
-.custom-select-light {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23007bff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
-    background-position: right 1rem center !important;
-    background-repeat: no-repeat !important;
-    background-size: 14px 14px !important;
+/* Dark grey inputs jaisa image mein hai */
+.auth-input {
+    width: 100%;
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 16px 20px;
+    color: #ffffff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s ease;
 }
 
-.animate-slide-up {
-    animation: slideIn 0.8s ease-out;
+.auth-input:focus {
+    border-color: #9dff50;
+    /* Neon green focus border */
 }
 
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Neon Green Button */
+.btn-neon {
+    width: 100%;
+    background-color: #9dff50;
+    color: #000000;
+    border: none;
+    border-radius: 30px;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
 }
-/* --- APKA ORIGINAL CODE END --- */
 
+.btn-neon:active {
+    transform: scale(0.98);
+}
 
-/* --- RESPONSIVE MEDIA QUERIES (NEW) --- */
+/* Checkbox aur terms link */
+.terms-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #666666;
+}
+
+.terms-link {
+    color: #e5ff00;
+    /* Neon yellow color */
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* Footer link styling */
+.auth-footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #666666;
+    font-size: 14px;
+}
+
+.auth-footer a {
+    color: #e5ff00;
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 5px;
+}
 
 @media (max-width: 768px) {
-    /* Tablet par card ki padding thori kam */
-    .glass-card-light {
-        padding: 2rem !important;
+    .auth-header h2 {
+        font-size: 24px;
+    }
+    .auth-card {
+        max-width: 380px;
+        padding: 15px;
     }
 }
 
-@media (max-width: 576px) {
-    /* Mobile par container aur card ki settings */
-    .light-vibrant-bg {
-        padding: 20px 10px; /* Screen edges se space */
-        display: flex;
-        align-items: center;
+/* Mobile Phones (Max width 480px) */
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 15px; /* Screen edges se kam fasla */
+        align-items: flex-start; /* Mobile par upar se start ho (agar keyboard khule) */
+        padding-top: 50px;
     }
 
-    .glass-card-light {
-        padding: 1.5rem !important; /* Mobile par card chota aur clean lagega */
-        margin: 0 auto;
-        border-radius: 15px !important;
+    .auth-card {
+        max-width: 100%;
+        background: transparent; /* Mobile par mazeed clean look */
+        backdrop-filter: none;
     }
 
-    /* Heading fix */
-    h2 {
-        font-size: 1.5rem !important;
+    .auth-header h2 {
+        font-size: 22px;
     }
 
-    /* Input zoom fix for mobile browsers */
-    .light-input {
-        font-size: 16px !important; 
-        padding: 10px !important;
+    .auth-header p {
+        font-size: 13px;
     }
 
-    /* Button size adjustment for smaller screens */
-    button[type="submit"] {
-        padding: 12px !important;
-        font-size: 1rem !important;
+    .auth-input {
+        padding: 14px 16px; /* Choti screen par thode chote inputs */
+        font-size: 14px;
     }
 
-    .input-group-text {
-    display: none;
+    .btn-neon {
+        padding: 14px;
+        font-size: 16px;
+    }
 
+    .auth-footer {
+        font-size: 13px;
+    }
 }
+
+/* Height fix for small landscape phones */
+@media (max-height: 600px) {
+    .auth-container {
+        align-items: flex-start;
+        padding-top: 20px;
+    }
 }

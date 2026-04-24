@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaHome, FaSignOutAlt, FaCar, FaSearch, FaUserAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { FaHome, FaSignOutAlt, FaCar, FaSearch, FaUserAlt, FaBars, FaTimes, FaClipboardList } from 'react-icons/fa';
 import { auth } from '../config/firebase';
 import { signOut } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 
-const Sidebar = ({ role }) => {
+const Sidebar = ({ role, activeTab, setActiveTab }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -20,46 +19,64 @@ const Sidebar = ({ role }) => {
     }
   };
 
-  const isActive = (path) => location.pathname === path ? 'active' : '';
-
   return (
     <>
-      {/* Mobile Hamburger Toggle */}
-      <div className="hamburger-btn d-md-none" onClick={() => setIsOpen(!isOpen)}>
+      <div className="hamburger-btn" onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? <FaTimes /> : <FaBars />}
       </div>
 
-      {/* Dark Overlay for Mobile */}
       {isOpen && <div className="sidebar-overlay d-md-none" onClick={() => setIsOpen(false)}></div>}
 
       <div className={`sidebar-container ${isOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-logo">
-          <h3 className="fw-bold m-0">Uni<span style={{color: '#007bff'}}>Route</span></h3>
+          <h3 className="fw-bold m-0">Uni<span style={{ color: '#9dff50' }}>Route</span></h3>
         </div>
-        
+
         <nav className="sidebar-nav">
-          <Link to="/dashboard" className={`nav-item ${isActive('/dashboard')}`} onClick={() => setIsOpen(false)}>
+          {/* Dashboard Tab */}
+          <div 
+            className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} 
+            onClick={() => { setActiveTab('home'); setIsOpen(false); }}
+            style={{ cursor: 'pointer' }}
+          >
             <FaHome className="nav-icon" /> <span>Dashboard</span>
-          </Link>
-          
+          </div>
+
+          {/* Role Specific Tabs */}
           {role === 'driver' ? (
-            <Link to="/dashboard" className={`nav-item ${isActive('/dashboard')}`} onClick={() => setIsOpen(false)}>
-              <FaCar className="nav-icon" /> <span>Offer Ride</span>
-            </Link>
+            <>
+              {/* NAYA TAB: My Rides */}
+              <div 
+                className={`nav-item ${activeTab === 'myrides' ? 'active' : ''}`} 
+                onClick={() => { setActiveTab('myrides'); setIsOpen(false); }}
+                style={{ cursor: 'pointer' }}
+              >
+                <FaClipboardList className="nav-icon" /> <span>My Rides</span>
+              </div>
+            </>
           ) : (
-            <Link to="/find-ride" className={`nav-item ${isActive('/find-ride')}`} onClick={() => setIsOpen(false)}>
+            <div 
+              className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} 
+              onClick={() => { setActiveTab('home'); setIsOpen(false); }}
+              style={{ cursor: 'pointer' }}
+            >
               <FaSearch className="nav-icon" /> <span>Find Ride</span>
-            </Link>
+            </div>
           )}
 
-          <Link to="/profile" className={`nav-item ${isActive('/profile')}`} onClick={() => setIsOpen(false)}>
+          {/* Profile Tab */}
+          <div 
+            className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} 
+            onClick={() => { setActiveTab('profile'); setIsOpen(false); }}
+            style={{ cursor: 'pointer' }}
+          >
             <FaUserAlt className="nav-icon" /> <span>Profile</span>
-          </Link>
+          </div>
         </nav>
 
         <div className="sidebar-footer">
-          <button className="logout-btn w-100" onClick={handleLogout}>
-            <FaSignOutAlt className="nav-icon" /> Logout
+          <button className="logout-btn-neon" onClick={handleLogout}>
+            <FaSignOutAlt className="nav-icon" /> <span>Logout</span>
           </button>
         </div>
       </div>
@@ -67,4 +84,4 @@ const Sidebar = ({ role }) => {
   );
 };
 
-export default Sidebar;
+export default Sidebar; 

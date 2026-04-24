@@ -1,38 +1,148 @@
-/* StudentProfile.css */
+.student-profile-main {
+    min-height: 100vh;
+    background-color: #0a0a0a !important; /* Pure Dark */
+    color: white;
+}
 
-.hover-shadow {
+.loader-container {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0a0a0a;
+}
+
+/* Sidebar Profile Card */
+.neon-profile-card {
+    background: rgba(25, 25, 25, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(157, 255, 80, 0.1);
+    border-radius: 25px;
+    padding: 35px 25px;
+    position: sticky;
+    top: 20px;
+}
+
+.neon-avatar-ring {
+    width: 120px;
+    height: 120px;
+    border: 2px solid #9dff50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(157, 255, 80, 0.2);
+}
+
+.neon-text-green {
+    color: #9dff50;
+    text-shadow: 0 0 10px rgba(157, 255, 80, 0.3);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+.neon-icon-sm {
+    color: #9dff50;
+}
+
+/* History Cards */
+.history-neon-item {
+    background: rgba(25, 25, 25, 0.8);
+    border-left: 4px solid #9dff50;
+    border-radius: 15px;
+    margin-bottom: 20px;
     transition: all 0.3s ease;
 }
 
-.hover-shadow:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
+.history-neon-item:hover {
+    transform: translateX(5px);
+    background: rgba(35, 35, 35, 1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
 
-/* Mobile Responsive Adjustments */
-@media (max-width: 768px) {
-    .profile-container {
-        padding-top: 20px !important;
-    }
-    
-    .user-info-card {
-        margin-bottom: 20px;
-    }
-
-    /* Long address/location names handling */
-    .location-text {
-        font-size: 0.85rem;
-        word-break: break-word;
-    }
-
-    /* Status badge size for small screens */
-    .status-badge {
-        font-size: 0.7rem !important;
-        padding: 6px 10px !important;
-    }
-    
-    /* Ride list item padding */
-    .request-item-inner {
-        padding: 12px !important;
-    }
+.route-display {
+    position: relative;
+    padding-left: 10px;
 }
+
+.route-point {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dot.green { background: #9dff50; box-shadow: 0 0 8px #9dff50; }
+.dot.red { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
+
+.route-line-neon {
+    width: 2px;
+    height: 20px;
+    background: rgba(157, 255, 80, 0.2);
+    margin-left: 4px;
+}
+
+.address-text {
+    color: #ddd;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fare-text {
+    color: #9dff50;
+    font-weight: 800;
+}
+
+/* Status Badges */
+.status-badge-neon {
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+.bg-neon-success { background: rgba(157, 255, 80, 0.1) !important; color: #9dff50 !important; border: 1px solid #9dff50; }
+.bg-neon-danger { background: rgba(255, 68, 68, 0.1) !important; color: #ff4444 !important; border: 1px solid #ff4444; }
+.bg-neon-warning { background: rgba(255, 193, 7, 0.1) !important; color: #ffc107 !important; border: 1px solid #ffc107; }
+
+/* Buttons & Others */
+.btn-neon-outline {
+    background: transparent;
+    border: 1px solid #9dff50;
+    color: #9dff50;
+    border-radius: 12px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-neon-outline:hover {
+    background: #9dff50;
+    color: black;
+}
+
+.total-badge {
+    background: #9dff50 !important;
+    color: black !important;
+    padding: 8px 15px !important;
+    border-radius: 8px !important;
+}
+
+.border-top-dark {
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.letter-spacing-1 { letter-spacing: 1.5px; }

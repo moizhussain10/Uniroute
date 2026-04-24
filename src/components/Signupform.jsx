@@ -1,111 +1,116 @@
-import React from "react";
-import { Form, Button, Card, Container, Row, Col, InputGroup } from "react-bootstrap";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaUserPlus, FaEnvelope, FaLock, FaUserTag } from 'react-icons/fa'; // Naye Icons
 import "./Signupform.css";
 
 const Signupform = ({ registeruser }) => {
-  const handleSubmit = (event) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const form = event.target;
-    const name = form.name.value; // Name field add kar diya hai
-    const email = form.email.value;
-    const password = form.password.value;
-    const role = form.role.value;
-    registeruser({ email, password, role, name }); // Driver Profile ke liye name zaroori hai
+    setLoading(true);
+
+    const formData = new FormData(event.target);
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      password: formData.get("password"),
+      role: formData.get("role"),
+    };
+
+    // Data verification
+    if (!data.name || !data.email || !data.phone) {
+      alert("Please fill all fields");
+      setLoading(false);
+      return;
+    }
+
+    await registeruser(data);
+    setLoading(false);
   };
 
   return (
-    // "bg-gradient-dark" ko "light-vibrant-bg" se replace kiya
-    <div className="light-vibrant-bg d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-      <Container>
-        <Row className="justify-content-center mx-o">
-          <Col xs={12} sm={10} md={8} lg={6}>
-            {/* "glass-card" ko "glass-card-light" se replace kiya aur "p-5" card radius barha di */}
-            <Card className="p-4 p-md-5 glass-card-light animate-slide-up shadow-sm border-0" style={{ borderRadius: '20px' }}>
-              <div className="text-center mb-5">
-                {/* Neon text hata kar bold professional text kar diya */}
-                <h2 className="fw-bold mb-1" style={{ color: '#007bff', letterSpacing: '1px' }}>UniRoute</h2>
-              </div>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2>Create Account Now</h2>
+          <p>Join UniRoute and start managing your rides!</p>
+        </div>
 
-              <Form onSubmit={handleSubmit}>
-                {/* Full Name Input - Added Icons and Light Style */}
-                <Form.Group className="mb-4" controlId="formBasicName">
-                  <Form.Label className="small fw-bold text-secondary">Full Name</Form.Label>
-                  <InputGroup className="shadow-xs rounded-3 overflow-hidden">
-                      <InputGroup.Text className="bg-white border-end-0 text-muted"><FaUserTag /></InputGroup.Text>
-                      <Form.Control 
-                        type="text" 
-                        name="name" 
-                        placeholder="e.g. Ali Ahmed" 
-                        required 
-                        className="light-input border-start-0 ps-1" 
-                      />
-                  </InputGroup>
-                </Form.Group>
+        <form onSubmit={handleSubmit}>
+          {/* Full Name - Pehle rakha hai sequence ke liye */}
+          <div className="form-group">
+            <label>Full Name</label>
+            <input 
+              type="text" 
+              name="name" 
+              placeholder="Enter your full name" 
+              required 
+              className="auth-input" 
+            />
+          </div>
 
-                {/* Email Input */}
-                <Form.Group className="mb-4" controlId="formBasicEmail">
-                  <Form.Label className="small fw-bold text-secondary">Email Address</Form.Label>
-                  <InputGroup className="shadow-xs rounded-3 overflow-hidden">
-                      <InputGroup.Text className="bg-white border-end-0 text-muted"><FaEnvelope /></InputGroup.Text>
-                      <Form.Control 
-                        type="email" 
-                        name="email" 
-                        placeholder="yourname@aptech.edu.pk" 
-                        required 
-                        className="light-input border-start-0 ps-1" 
-                      />
-                  </InputGroup>
-                </Form.Group>
+          <div className="form-group">
+            <label>Email</label>
+            <input 
+              type="email" 
+              name="email" 
+              placeholder="Email Address" 
+              required 
+              className="auth-input" 
+            />
+          </div>
 
-                {/* Password Input */}
-                <Form.Group className="mb-4" controlId="formBasicPassword">
-                  <Form.Label className="small fw-bold text-secondary">Password</Form.Label>
-                  <InputGroup className="shadow-xs rounded-3 overflow-hidden">
-                      <InputGroup.Text className="bg-white border-end-0 text-muted"><FaLock /></InputGroup.Text>
-                      <Form.Control 
-                        type="password" 
-                        name="password" 
-                        placeholder="••••••••" 
-                        minLength={6} 
-                        required 
-                        className="light-input border-start-0 ps-1" 
-                      />
-                  </InputGroup>
-                </Form.Group>
+          <div className="form-group">
+            <label>Password</label>
+            <input 
+              type="password" 
+              name="password" 
+              placeholder="Password (Min 6 chars)" 
+              minLength={6} 
+              required 
+              className="auth-input" 
+            />
+          </div>
 
-                {/* Role Select Dropdown */}
-                <Form.Group className="mb-5" controlId="formBasicRole">
-                  <Form.Label className="small fw-bold text-secondary">I want to:</Form.Label>
-                  <Form.Select name="role" className="light-input custom-select-light" style={{ borderRadius: '10px' }} required>
-                    <option value="student">Passenger</option>
-                    <option value="driver">Driver</option>
-                  </Form.Select>
-                </Form.Group>
+          {/* NAYA FIELD: Phone Number */}
+          <div className="form-group">
+            <label>Phone Number</label>
+            <input 
+              type="tel" 
+              name="phone" 
+              placeholder="03xx xxxxxxx" 
+              pattern="[0-9]{11}" 
+              title="Please enter a valid 11-digit phone number"
+              required 
+              className="auth-input" 
+            />
+          </div>
 
-                {/* Submit Button */}
-                <Button 
-                  type="submit" 
-                  className="w-100 py-3 fw-bold shadow-sm"
-                  style={{ borderRadius: '12px', fontSize: '1.1rem', background: '#007bff', border: 'none' }}
-                >
-                  <FaUserPlus className="me-2 mb-1" /> CREATE MY ACCOUNT
-                </Button>
-              </Form>
+          <div className="form-group">
+            <label>I want to:</label>
+            <select name="role" className="auth-input" required>
+              <option value="student">Passenger</option>
+              <option value="driver">Driver</option>
+            </select>
+          </div>
 
-              <div className="text-center mt-4 pt-2 border-top">
-                <small className="text-muted">
-                  Already registered?{" "}
-                  <Link to="/login" className="fw-bold" style={{ color: '#007bff', textDecoration: 'none' }}>
-                    Login Here
-                  </Link>
-                </small>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+          <div className="terms-container">
+            <input type="checkbox" required />
+            <span>
+              I agree to <span className="terms-link">Terms</span> and <span className="terms-link">Privacy Policy</span>.
+            </span>
+          </div>
+
+          <button type="submit" className="btn-neon" disabled={loading}>
+            {loading ? "Creating Account..." : "Sign Up"}
+          </button>
+        </form>
+
+        <div className="auth-footer">
+          Already Have An Account? <Link to="/login">Login</Link>
+        </div>
+      </div>
     </div>
   );
 };

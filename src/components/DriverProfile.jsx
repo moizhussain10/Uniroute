@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Spinner, Modal, Form } from 'react-bootstrap';
-import { FaUserCircle, FaCar, FaIdCard, FaEnvelope, FaCalendarAlt, FaStar, FaEdit } from 'react-icons/fa';
+import { FaUserCircle, FaCar, FaIdCard, FaEnvelope, FaCalendarAlt, FaStar, FaEdit, FaShieldAlt } from 'react-icons/fa';
 import { auth, db } from '../config/firebase';
 import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import './DriverProfile.css'; // Neon theme CSS
 
 const DriverProfile = () => {
     const [userData, setUserData] = useState(null);
     const [rideCount, setRideCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    // --- Edit Logic States ---
     const [showEditModal, setShowEditModal] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const [editData, setEditData] = useState({ vehicleName: '', vehicleNumber: '' });
@@ -18,19 +18,26 @@ const DriverProfile = () => {
         const fetchProfileData = async () => {
             try {
                 const user = auth.currentUser;
+
+                console.log(user)
                 if (user) {
+                    // Firestore se user ka document nikalna
                     const docRef = doc(db, "users", user.uid);
                     const docSnap = await getDoc(docRef);
+
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        setUserData(data);
-                        // Modal ke inputs mein purana data pehle se show ho
+                        console.log("Fetched User Data:", data); // Debugging ke liye
+
+                        setUserData(data); // Yahan pura data save ho raha hai (including name)
+
                         setEditData({
                             vehicleName: data.vehicleName || "Honda 125",
                             vehicleNumber: data.vehicleNumber || "KAE-XXXX"
                         });
                     }
 
+                    // Rides count fetch karna
                     const q = query(collection(db, "rides"), where("driverId", "==", user.uid));
                     const querySnapshot = await getDocs(q);
                     setRideCount(querySnapshot.size);
@@ -41,11 +48,11 @@ const DriverProfile = () => {
                 setLoading(false);
             }
         };
-
         fetchProfileData();
     }, []);
 
-    // --- Update Function ---
+    console.log(userData)
+
     const handleUpdate = async (e) => {
         e.preventDefault();
         setIsUpdating(true);
@@ -55,137 +62,138 @@ const DriverProfile = () => {
                 vehicleName: editData.vehicleName,
                 vehicleNumber: editData.vehicleNumber
             });
-
-            // State update karein taake UI pe foran nazar aaye
-            setUserData({ 
-                ...userData, 
-                vehicleName: editData.vehicleName, 
-                vehicleNumber: editData.vehicleNumber 
-            });
-            
+            setUserData({ ...userData, vehicleName: editData.vehicleName, vehicleNumber: editData.vehicleNumber });
             setShowEditModal(false);
-            alert("Vehicle details updated successfully! 🚀");
         } catch (error) {
-            alert("Update fail ho gaya: " + error.message);
+            alert("Update fail: " + error.message);
         } finally {
             setIsUpdating(false);
         }
     };
 
     if (loading) return (
-        <div className="d-flex justify-content-center align-items-center" style={{height: '80vh'}}>
-            <Spinner animation="border" variant="primary" />
+        <div className="d-flex flex-column justify-content-center align-items-center" style={{height: '80vh', background: '#000'}}>
+            <Spinner animation="border" style={{color: '#9dff50'}} />
+            <p className="mt-3" style={{color: '#9dff50', letterSpacing: '2px'}}>LOADING PROFILE...</p>
         </div>
     );
 
     return (
-        <Container className="py-5 animate-slide-up">
-            <Row className="justify-content-center">
+        <Container className="profile-container py-4" >
+            <Row>
                 <Col lg={10}>
-                    {/* Header Section - No Changes */}
-                    <Card className="border-0 shadow-sm mb-4 overflow-hidden" style={{ borderRadius: '20px' }}>
-                        <div style={{ height: '120px', background: 'linear-gradient(90deg, #007bff, #00c6ff)' }}></div>
-                        <Card.Body className="text-center" style={{ marginTop: '-60px' }}>
-                            <div className="mb-3">
-                                <FaUserCircle size={100} className="bg-white rounded-circle text-secondary shadow-sm" />
+                    {/* --- Profile Header Card --- */}
+                    <Card className="glass-panel profile-header-card mb-4">
+                        <Card.Body className="text-center p-0">
+                            <div className="profile-cover"></div>
+                            <div className="profile-avatar-wrapper">
+                                <FaUserCircle size={110} className="profile-icon" />
+                                <div className="online-indicator"></div>
                             </div>
-                            <h3 className="fw-bold mb-1">{userData?.name || "Driver Name"}</h3>
-                            <Badge bg="primary" className="px-3 py-2 rounded-pill">Verified Driver</Badge>
-                            <div className="d-flex justify-content-center gap-4 mt-4 text-muted">
-                                <div><h5 className="fw-bold text-dark mb-0">{rideCount}</h5><small>Total Rides</small></div>
-                                <div style={{borderLeft: '1px solid #eee'}}></div>
-                                <div><h5 className="fw-bold text-dark mb-0">4.8 <FaStar className="text-warning mb-1" size={14}/></h5><small>Rating</small></div>
+                            <div className="pb-4 pt-2">
+                                <h2 className="neon-text-main fw-bold mb-1 text-uppercase">{userData?.name || "Driver Name"}</h2>
+                                <div className="d-flex justify-content-center align-items-center gap-2 mb-3">
+                                    <Badge className="badge-neon"><FaShieldAlt className="me-1" /> Verified Driver</Badge>
+                                </div>
+
+                                <div className="stats-row d-flex justify-content-center gap-5 mt-4">
+                                    <div className="stat-item">
+                                        <h4 className="fw-bold neon-text-blue mb-0">{rideCount}</h4>
+                                        <small className="text-muted text-uppercase">Rides</small>
+                                    </div>
+                                    <div className="stat-divider"></div>
+                                    <div className="stat-item">
+                                        <h4 className="fw-bold neon-text-yellow mb-0">4.8 <FaStar size={14} /></h4>
+                                        <small className="text-muted text-uppercase">Rating</small>
+                                    </div>
+                                </div>
                             </div>
                         </Card.Body>
                     </Card>
 
                     <Row>
-                        {/* Personal Details - No Changes */}
+                        {/* --- Personal Info --- */}
                         <Col md={6} className="mb-4">
-                            <Card className="border-0 shadow-sm h-100 p-3" style={{ borderRadius: '15px' }}>
+                            <Card className="glass-panel h-100">
                                 <Card.Body>
-                                    <h5 className="fw-bold mb-4 text-primary border-bottom pb-2">Personal Information</h5>
-                                    <div className="d-flex align-items-center mb-3">
-                                        <div className="p-2 bg-light rounded-3 me-3"><FaEnvelope className="text-primary" /></div>
-                                        <div><p className="small text-muted mb-0">Email Address</p><h6 className="mb-0">{auth.currentUser?.email}</h6></div>
+                                    <h5 className="section-title mb-4"><FaIdCard className="me-2" /> Information</h5>
+                                    <div className="info-box mb-3">
+                                        <FaEnvelope className="info-icon" />
+                                        <div>
+                                            <span>Email Address</span>
+                                            <h6>{auth.currentUser?.email}</h6>
+                                        </div>
                                     </div>
-                                    <div className="d-flex align-items-center mb-3">
-                                        <div className="p-2 bg-light rounded-3 me-3"><FaIdCard className="text-primary" /></div>
-                                        <div><p className="small text-muted mb-0">Role</p><h6 className="mb-0 text-capitalize">{userData?.role || "Driver"}</h6></div>
+                                    <div className="info-box mb-3">
+                                        <FaCalendarAlt className="info-icon" />
+                                        <div>
+                                            <span>Phone Number</span>
+                                            <h6>{userData.phone}</h6>
+                                        </div>
                                     </div>
-                                    <div className="d-flex align-items-center">
-                                        <div className="p-2 bg-light rounded-3 me-3"><FaCalendarAlt className="text-primary" /></div>
-                                        <div><p className="small text-muted mb-0">Member Since</p><h6 className="mb-0">April 2026</h6></div>
+                                    <div className="info-box mb-3">
+                                        <FaCalendarAlt className="info-icon" />
+                                        <div>
+                                            <span>Member Since</span>
+                                            <h6>April 2026</h6>
+                                        </div>
                                     </div>
                                 </Card.Body>
                             </Card>
                         </Col>
 
-                        {/* Vehicle Details - Added Button onClick */}
+                        {/* --- Vehicle Info --- */}
                         <Col md={6} className="mb-4">
-                            <Card className="border-0 shadow-sm h-100 p-3" style={{ borderRadius: '15px' }}>
-                                <Card.Body>
-                                    <h5 className="fw-bold mb-4 text-primary border-bottom pb-2">Primary Vehicle</h5>
-                                    <div className="text-center py-3 bg-light rounded-4 mb-3">
-                                        <FaCar size={40} className="text-secondary mb-2" />
-                                        <h5 className="fw-bold mb-1">{userData?.vehicleName || "Honda 125"}</h5>
-                                        <p className="text-muted mb-0">{userData?.vehicleNumber || "KAE-XXXX"}</p>
+                            <Card className="glass-panel h-100">
+                                <Card.Body className="d-flex flex-column">
+                                    <h5 className="section-title mb-4"><FaCar className="me-2" /> Primary Vehicle</h5>
+                                    <div className="vehicle-display mb-3">
+                                        <div className="vehicle-badge">Active</div>
+                                        <FaCar size={40} className="mb-2" style={{ color: '#9dff50' }} />
+                                        <h4 className="fw-bold mb-0 text-white">{userData?.vehicleName || "Honda 125"}</h4>
+                                        <p className="vehicle-number">{userData?.vehicleNumber || "KAE-XXXX"}</p>
                                     </div>
-                                    <Button 
-                                        variant="outline-primary" 
-                                        className="w-100 rounded-3 fw-bold mt-2"
-                                        onClick={() => setShowEditModal(true)}
-                                    >
-                                        <FaEdit className="me-2"/> Edit Vehicle Details
+                                    <Button className="btn-neon-edit mt-auto" onClick={() => setShowEditModal(true)}>
+                                        <FaEdit className="me-2" /> Update Details
                                     </Button>
                                 </Card.Body>
                             </Card>
                         </Col>
                     </Row>
 
-                    <Button variant="danger" className="w-100 py-3 shadow-sm border-0" style={{ borderRadius: '12px', fontWeight: 'bold' }}>
-                        DEACTIVATE ACCOUNT
-                    </Button>
+                    <button className="deactivate-link">Deactivate UniRoute Account</button>
                 </Col>
             </Row>
 
-            {/* --- Edit Vehicle Modal (Light Theme) --- */}
-            <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
-                <Modal.Header closeButton className="border-0">
-                    <Modal.Title className="fw-bold">Update Vehicle</Modal.Title>
+            {/* --- Dark Edit Modal --- */}
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered className="dark-modal">
+                <Modal.Header closeButton closeVariant="white" className="border-0 bg-dark text-white">
+                    <Modal.Title className="fw-bold neon-text-main">Update Vehicle</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className="px-4 pb-4">
+                <Modal.Body className="bg-dark p-4">
                     <Form onSubmit={handleUpdate}>
                         <Form.Group className="mb-3">
-                            <Form.Label className="small fw-bold text-muted">Vehicle Name</Form.Label>
-                            <Form.Control 
+                            <Form.Label className="neon-label">Vehicle Name</Form.Label>
+                            <Form.Control
                                 type="text"
-                                className="py-2"
-                                style={{ borderRadius: '10px' }}
+                                className="neon-input"
                                 value={editData.vehicleName}
-                                onChange={(e) => setEditData({...editData, vehicleName: e.target.value})}
+                                onChange={(e) => setEditData({ ...editData, vehicleName: e.target.value })}
                                 required
                             />
                         </Form.Group>
                         <Form.Group className="mb-4">
-                            <Form.Label className="small fw-bold text-muted">Number Plate</Form.Label>
-                            <Form.Control 
+                            <Form.Label className="neon-label">Number Plate</Form.Label>
+                            <Form.Control
                                 type="text"
-                                className="py-2"
-                                style={{ borderRadius: '10px' }}
+                                className="neon-input"
                                 value={editData.vehicleNumber}
-                                onChange={(e) => setEditData({...editData, vehicleNumber: e.target.value})}
+                                onChange={(e) => setEditData({ ...editData, vehicleNumber: e.target.value })}
                                 required
                             />
                         </Form.Group>
-                        <Button 
-                            variant="primary" 
-                            type="submit" 
-                            className="w-100 py-2 fw-bold shadow-sm"
-                            style={{ borderRadius: '10px' }}
-                            disabled={isUpdating}
-                        >
-                            {isUpdating ? <Spinner animation="border" size="sm" /> : "Save Changes"}
+                        <Button variant="primary" type="submit" className="btn-neon-submit w-100 py-3" disabled={isUpdating}>
+                            {isUpdating ? <Spinner animation="border" size="sm" /> : "CONFIRM UPDATE"}
                         </Button>
                     </Form>
                 </Modal.Body>

@@ -2,7 +2,7 @@ import React from 'react';
 import Signupform from "../components/Signupform";
 import { auth, db } from '../config/firebase'; 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from "firebase/firestore"; // Yeh dono imports zaroori hain
+import { doc, setDoc, serverTimestamp } from "firebase/firestore"; // serverTimestamp better hai
 import { useNavigate } from 'react-router-dom';
 
 function Signup() {
@@ -10,33 +10,39 @@ function Signup() {
 
   const registeruser = async (values) => {
     try {
-      // 1. Pehle Auth mein user create karo
+      // 1. Create User in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
-      // 2. Phir Firestore mein "users" collection mein data save karo
-      // Hum 'doc' use karenge aur ID wahi rakhenge jo Auth ki 'uid' hai
+      console.log("Auth created: ", user.uid);
+
+      // 2. Save Additional Info in Firestore
+      // Hum 'await' yahan isliye kar rahe hain taake database mein save hone se pehle navigate na ho
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
+        name: values.name, 
         email: values.email,
-        role: values.role, // 'student' ya 'driver'
-        createdAt: new Date(),
-        isVerified: false // Future use ke liye (ID Card verification)
+        phone: values.phone,
+        role: values.role,
+        createdAt: serverTimestamp(), // Best practice
+        isVerified: false,
+        vehicleName: values.role === "driver" ? "" : null, // Driver ke liye default fields
+        vehicleNumber: values.role === "driver" ? "" : null
       });
 
-      console.log("User registered & Role saved in Firestore!");
+      console.log("Firestore data saved successfully!");
+      alert("Registration Successful!");
       navigate("/login");
       
     } catch (error) {
-      console.error("Error signing up:", error.message);
+      console.error("Signup Error:", error.code, error.message);
+      // Agar error "permission-denied" hai toh Firebase Rules check karein
       alert(error.message);
     }
   };
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <Signupform registeruser={registeruser} />
-    </div>
+    <Signupform registeruser={registeruser} />
   );
 }
 

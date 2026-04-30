@@ -240,9 +240,6 @@ return (
             </h2>
             <p className="text-muted">Where are we going today?</p>
           </div>
-          <div className="wallet-badge d-none d-md-block">
-            <FaWallet className="me-2" /> Rs. 1,250
-          </div>
         </div>
       </div>
 

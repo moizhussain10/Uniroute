@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
-import { auth, db } from '../config/firebase';
+import { auth, db, onAuthStateChanged } from '../config/firebase';
 import { collection, addDoc, query, where, onSnapshot, doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import L from 'leaflet';
 import { FaSearch, FaMapMarkerAlt, FaCar, FaClock, FaUsers, FaBell } from 'react-icons/fa';
@@ -53,21 +53,64 @@ const DriverDashboard = () => {
     const [selectionStep, setSelectionStep] = useState('pickup');
     const [driverPhone, setDriverPhone] = useState("");
     const [driverName, setDriverName] = useState("");
+    const [activeTripId, setActiveTripId] = useState(null);
+
+    // 🔥 1. LIVE LOCATION TRACKING EFFECT
+    useEffect(() => {
+        let watchId;
+        if (activeTripId) {
+            console.log("📡 Starting Live Tracking for Trip:", activeTripId);
+
+            watchId = navigator.geolocation.watchPosition(
+                async (position) => {
+                    const liveCoords = [position.coords.latitude, position.coords.longitude];
+                    console.log("📍 Live GPS:", liveCoords);
+
+                    try {
+                        // Firestore mein driver ki live location update ho rahi hai
+                        const tripRef = doc(db, "requests", activeTripId);
+                        await updateDoc(tripRef, {
+                            driverCurrentCoords: liveCoords
+                        });
+                    } catch (err) {
+                        console.error("Live Update Error:", err);
+                    }
+                },
+                (err) => console.error("GPS Error:", err),
+                { enableHighAccuracy: true, distanceFilter: 5 } // 5 meter move hone par update karega
+            );
+        }
+
+        return () => {
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+        };
+    }, [activeTripId]);
 
     // 1. User Data Fetching
     useEffect(() => {
-        const fetchDriverData = async () => {
-            const user = auth.currentUser;
+        // 1. Auth state ka intezar karo
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                const docSnap = await getDoc(doc(db, "users", user.uid));
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    setDriverPhone(data.phone || "");
-                    setDriverName(data.name || "");
+                try {
+                    const docRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        setDriverPhone(data.phone || "");
+                        setDriverName(data.name || "");
+                        console.log("Driver data fetched:", data.name);
+                    }
+                } catch (error) {
+                    console.error("Firestore fetching mein masla:", error);
                 }
+            } else {
+                console.log("User logged in nahi hai.");
             }
-        };
-        fetchDriverData();
+        });
+
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
     }, []);
 
     // 2. Notifications Logic
@@ -112,13 +155,13 @@ const DriverDashboard = () => {
     const handleMapSearch = async (e) => {
         if (e) e.preventDefault();
         if (!searchQuery) return;
-        
+
         try {
             // Karachi bounding box for better results
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery + " Karachi")}&limit=1`;
             const response = await fetch(url);
             const results = await response.json();
-            
+
             if (results && results.length > 0) {
                 const newCoords = [parseFloat(results[0].lat), parseFloat(results[0].lon)];
                 setTempPos(newCoords); // Isse ChangeView trigger hoga aur map fly karega
@@ -126,18 +169,39 @@ const DriverDashboard = () => {
             } else {
                 alert("Location not found! 📍");
             }
-        } catch (error) { 
-            console.error("Search failed:", error); 
+        } catch (error) {
+            console.error("Search failed:", error);
             alert("Search service error");
         }
     };
 
+    // 🔥 2. UPDATE HANDLE ACTION
     const handleAction = async (requestId, action) => {
         try {
-            await updateDoc(doc(db, "requests", requestId), { status: action });
-        } catch (error) { console.error(error); }
+            if (action === 'accepted') {
+                // Pehle driver ki current GPS position lein
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const currentGPS = [position.coords.latitude, position.coords.longitude];
+
+                    await updateDoc(doc(db, "requests", requestId), {
+                        status: 'accepted',
+                        driverName: driverName,
+                        driverPhone: driverPhone,
+                        driverCurrentCoords: currentGPS // Click wala nahi, real GPS!
+                    });
+
+                    setActiveTripId(requestId); // Tracking shuru kar do
+                    alert("Ride Accepted! Tracking started.");
+                });
+            } else {
+                await updateDoc(doc(db, "requests", requestId), { status: action });
+            }
+        } catch (error) {
+            console.error("Action error:", error);
+        }
     };
 
+    // 🔥 3. UPDATE POST RIDE (Initial setup)
     const handlePostRide = async (e) => {
         e.preventDefault();
         if (!pickup.coords || !dest.coords) return alert("Please select both locations!");
@@ -149,6 +213,7 @@ const DriverDashboard = () => {
                 pickupCoords: pickup.coords,
                 destination: dest.address,
                 destCoords: dest.coords,
+                driverCurrentCoords: pickup.coords, // Start point
                 driverName: driverName || "Driver",
                 driverPhone: driverPhone || "No Number",
                 time: form.time.value,
@@ -160,10 +225,7 @@ const DriverDashboard = () => {
                 createdAt: serverTimestamp()
             });
             alert("Ride Posted! 🚀");
-            setPickup({ coords: null, address: '' });
-            setDest({ coords: null, address: '' });
-            setSelectionStep('pickup');
-            form.reset();
+            // Reset form logic...
         } catch (err) { alert("Error: " + err.message); }
         setLoading(false);
     };
@@ -219,13 +281,13 @@ const DriverDashboard = () => {
                 <div className="map-view-section">
                     <div className="map-search-bar">
                         <form onSubmit={handleMapSearch} style={{ display: 'flex', width: '100%' }}>
-                           <input
-                               type="text"
-                               placeholder="Search area (e.g. Clifton)..."
-                               value={searchQuery}
-                               onChange={(e) => setSearchQuery(e.target.value)}
-                           />
-                           <button type="submit"><FaSearch /></button>
+                            <input
+                                type="text"
+                                placeholder="Search area (e.g. Clifton)..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            <button type="submit"><FaSearch /></button>
                         </form>
                     </div>
 
@@ -249,14 +311,43 @@ const DriverDashboard = () => {
                             </div>
                             <FaBell />
                         </div>
+
                         <div className="request-body p-3">
-                            <p className="mb-1"><strong>Passenger:</strong> {req.passengerName || "Student"}</p>
-                            <p className="small text-muted mb-1"><FaMapMarkerAlt className="text-success me-1" /> {req.pickup}</p>
-                            <p className="small text-muted mb-0"><FaMapMarkerAlt className="text-danger me-1" /> {req.destination}</p>
+                            {/* --- Price Badge added here --- */}
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                <h6 className="mb-0 text-white fw-bold">{req.passengerName || "Student"}</h6>
+                                <span className="badge bg-success fs-6" style={{ boxShadow: '0 0 10px #9dff50' }}>
+                                    Rs. {req.fare || "0"}
+                                </span>
+                            </div>
+
+                            <p className="small text-muted mb-1">
+                                <FaMapMarkerAlt className="text-success me-1" />
+                                <strong>Pickup:</strong> {req.pickup}
+                            </p>
+                            <p className="small text-muted mb-0">
+                                <FaMapMarkerAlt className="text-danger me-1" />
+                                <strong>Drop:</strong> {req.destination}
+                            </p>
                         </div>
+
                         <div className="request-footer p-2 d-flex gap-2">
-                            <Button variant="success" size="sm" className="w-100 fw-bold" onClick={() => handleAction(req.id, 'accepted')}>ACCEPT</Button>
-                            <Button variant="outline-danger" size="sm" className="w-100 fw-bold" onClick={() => handleAction(req.id, 'rejected')}>REJECT</Button>
+                            <Button
+                                variant="success"
+                                size="sm"
+                                className="w-100 fw-bold neon-hover-btn"
+                                onClick={() => handleAction(req.id, 'accepted')}
+                            >
+                                ACCEPT & EARN
+                            </Button>
+                            <Button
+                                variant="outline-danger"
+                                size="sm"
+                                className="w-100 fw-bold"
+                                onClick={() => handleAction(req.id, 'rejected')}
+                            >
+                                REJECT
+                            </Button>
                         </div>
                     </div>
                 ))}

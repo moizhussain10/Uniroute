@@ -8,85 +8,59 @@
 
 /* --- Global Layout Rules --- */
 
-.dashboard-main-content {
-    flex: 1;
-    min-height: 100vh;
-    background: #000;
-    padding: 20px; /* Thora sa inner gap taake cards touch na hon */
-}
-
-/* Parent Wrapper */
+/* Parent Wrapper (Poori Screen ka Main Container) */
 .app-layout {
-    display: flex;
-    min-height: 100vh;
-    background: #000;
+    display: flex !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    background-color: #000000 !important; /* Pure Black Theme */
+    overflow-x: hidden;
 }
 
-/* Main Content (Dashboard ke liye) */
-.main-content-wrapper {
-    flex: 1;
-    width: calc(100% - 260px);
+/* Sidebar Wrapper - Desktop par iski width block rahegi */
+.sidebar-wrapper {
+    width: 260px !important;
+    flex-shrink: 0 !important;
+    background: #121212 !important; /* Dark Sidebar Background */
     min-height: 100vh;
+}
+
+/* Main Content Area (Form aur Map wala Hissa) */
+.dashboard-main-content {
+    flex-grow: 1 !important;
+    min-width: 0 !important; /* Grid aur Map ko overflow hone se rokta hai */
+    min-height: 100vh;
+    background: #000000;
+    padding: 20px !important;
+    
+    /* 🌟 Sabse Main Fix: Desktop par content sidebar ke BAAD shuru hoga */
+    margin-left: 260px !important; 
+    transition: margin-left 0.3s ease;
+}
+
+/* --- Responsive Rules (Mobile & Tablets) --- */
+@media (max-width: 1024px) {
+    .sidebar-wrapper {
+        display: none !important; /* Mobile par sidebar hide (agar hamburger use kar rahe hain) */
+    }
+    
+    .dashboard-main-content {
+        margin-left: 0 !important; /* Mobile par margin khatam taake full screen use ho */
+        padding-top: 80px !important; /* Top bar ya hamburger button ke liye space */
+        width: 100% !important;
+    }
 }
 
 /* --- Login/Signup Page Fix --- */
-/* Agar page login hai, toh wahan sidebar nahi hota, 
-   isliye margin-left zero hona chahiye. */
-
 .login-container, .signup-container {
     width: 100vw;
     height: 100vh;
-    position: fixed; /* Poori screen gher le */
+    position: fixed;
     top: 0;
     left: 0;
-    z-index: 3000; /* Sidebar se upar aajaye */
+    z-index: 9999; /* Har cheez se upar */
     background: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-@media (max-width: 992px) {
-    .dashboard-main-content {
-        margin-left: 0;
-        width: 100%;
-        padding-top: 80px; /* Hamburger button ke liye space */
-    }
-}
-
-.app-layout {
-    display: flex !important;
-    width: 100% !important;
-    min-height: 100vh !important;
-    background-color: #f8f9fa !important;
-}
-
-/* Sidebar wrapper jo desktop par jagah gheray ga */
-.sidebar-wrapper {
-    width: 280px !important;
-    flex-shrink: 0 !important;
-    background: #fff !important;
-    border-right: 1px solid #eee !important;
-}
-
-.main-content {
-    flex-grow: 1 !important;
-    min-width: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* Content ke darmiyan koi faltu margin na ho */
-.main-content.with-sidebar {
-    margin-left: 0 !important; 
-    padding: 20px !important;
-}
-
-@media (max-width: 768px) {
-    .sidebar-wrapper {
-        display: none !important;
-    }
-    .main-content.with-sidebar {
-        padding-top: 80px !important;
-    }
 }

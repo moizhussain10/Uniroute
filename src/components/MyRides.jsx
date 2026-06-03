@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Badge, Button, Spinner } from 'react-bootstrap';
 import { FaCar, FaClock, FaUsers, FaTrash, FaMapMarkerAlt, FaRoad } from 'react-icons/fa';
 import { db, auth } from '../config/firebase';
 import { collection, query, where, onSnapshot, deleteDoc, doc, orderBy } from 'firebase/firestore';
-import './MyRides.css';
+
 
 const MyRides = () => {
     const [myRides, setMyRides] = useState([]);
@@ -46,84 +45,96 @@ const MyRides = () => {
     };
 
     if (loading) return (
-        <div className="loader-box">
-            <Spinner animation="border" style={{ color: '#9dff50' }} />
+        <div className="flex h-[80vh] w-full justify-center items-center">
+            {/* Pure Tailwind Loader Spinner */}
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#9dff50]"></div>
         </div>
     );
 
     return (
-        <div className="my-rides-wrapper">
-            <Container className="py-5">
-                <div className="d-flex justify-content-between align-items-center mb-5">
+        <div className="w-full bg-[#0a0a0a] min-h-screen text-white px-4 md:px-8 py-6">
+            <div className="max-w-7xl mx-auto">
+                
+                {/* Header Area */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                     <div>
-                        <h2 className="neon-text-green fw-bold mb-0">MY POSTED RIDES</h2>
-                        <p className="text-muted">Manage your active and past ride offers</p>
+                        <h2 className="text-[#9dff50] font-black text-2xl md:text-3xl tracking-wide uppercase" style={{ textShadow: '0 0 12px rgba(157, 255, 80, 0.25)' }}>
+                            MY POSTED RIDES
+                        </h2>
+                        <p className="text-gray-400 text-sm mt-1">Manage your active and past ride offers</p>
                     </div>
-                    <Badge className="ride-count-badge">{myRides.length} Total</Badge>
+                    <div className="bg-[#9dff50] text-black font-bold px-5 py-2.5 rounded-xl text-sm tracking-wide shadow-lg shadow-[#9dff50]/10">
+                        {myRides.length} Total
+                    </div>
                 </div>
 
-                <Row className="g-4">
-                    {myRides.length > 0 ? (
-                        myRides.map((ride) => (
-                            <Col key={ride.id} xs={12} lg={6}>
-                                <Card className="ride-manage-card">
-                                    <Card.Body className="p-4">
-                                        <div className="d-flex justify-content-between align-items-start mb-3">
-                                            <div className="vehicle-info-box">
-                                                <h5 className="text-white fw-bold mb-0">
-                                                    <FaCar className="neon-text-green me-2" /> {ride.vehicleName}
-                                                </h5>
-                                                <small className="text-muted">{ride.vehicleNumber}</small>
-                                            </div>
-                                            <Badge bg="dark" className="border border-success text-success px-3 py-2">
-                                                {ride.status?.toUpperCase() || "ACTIVE"}
-                                            </Badge>
-                                        </div>
+                {/* Rides Grid System (Pure Tailwind Grid) */}
+                {myRides.length > 0 ? (
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full">
+                        {myRides.map((ride) => (
+                            <div key={ride.id} className="bg-[#141414]/90 border border-gray-800/60 hover:border-[#9dff50]/30 rounded-2xl p-5 md:p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/80">
+                                
+                                {/* Top Content: Vehicle Name & Status */}
+                                <div className="flex justify-between items-start gap-4 mb-4">
+                                    <div className="min-w-0 flex-1">
+                                        <h5 className="text-white font-bold text-lg flex items-center gap-2 truncate">
+                                            <FaCar className="text-[#9dff50] flex-shrink-0" /> 
+                                            <span className="truncate">{ride.vehicleName}</span>
+                                        </h5>
+                                        <small className="text-gray-500 font-mono tracking-wider uppercase text-xs block mt-0.5">
+                                            {ride.vehicleNumber}
+                                        </small>
+                                    </div>
+                                    <div className="bg-black/40 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wider flex-shrink-0">
+                                        {ride.status?.toUpperCase() || "ACTIVE"}
+                                    </div>
+                                </div>
 
-                                        <div className="route-visual-neon my-4">
-                                            <div className="point">
-                                                <FaMapMarkerAlt className="text-success" />
-                                                <span className="address text-truncate">{ride.pickup}</span>
-                                            </div>
-                                            <div className="connecting-line"></div>
-                                            <div className="point">
-                                                <FaMapMarkerAlt className="text-danger" />
-                                                <span className="address text-truncate">{ride.destination}</span>
-                                            </div>
-                                        </div>
+                                {/* Route Details (With Line Visual) */}
+                                <div className="bg-white/[0.02] border border-white/[0.02] rounded-xl p-4 my-3 space-y-3">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <FaMapMarkerAlt className="text-emerald-500 flex-shrink-0" size={14} />
+                                        <span className="text-sm text-gray-300 truncate">{ride.pickup}</span>
+                                    </div>
+                                    <div className="w-[2px] h-4 bg-gradient-to-bottom bg-gray-700 ml-[6px] opacity-40"></div>
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <FaMapMarkerAlt className="text-red-500 flex-shrink-0" size={14} />
+                                        <span className="text-sm text-gray-300 truncate">{ride.destination}</span>
+                                    </div>
+                                </div>
 
-                                        <div className="d-flex justify-content-between align-items-center mt-4">
-                                            <div className="d-flex gap-3">
-                                                <div className="ride-meta">
-                                                    <FaClock className="neon-text-green me-1" />
-                                                    <span>{ride.time}</span>
-                                                </div>
-                                                <div className="ride-meta">
-                                                    <FaUsers className="neon-text-green me-1" />
-                                                    <span>{ride.seats} Seats</span>
-                                                </div>
-                                            </div>
-                                            <Button 
-                                                variant="outline-danger" 
-                                                className="btn-delete-neon"
-                                                onClick={() => handleDeleteRide(ride.id)}
-                                            >
-                                                <FaTrash />
-                                            </Button>
+                                {/* Footer Data: Meta Details & Delete Action */}
+                                <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/[0.04]">
+                                    <div className="flex gap-2 sm:gap-3">
+                                        <div className="bg-white/[0.04] border border-white/[0.02] text-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs">
+                                            <FaClock className="text-[#9dff50]" />
+                                            <span>{ride.time}</span>
                                         </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        ))
-                    ) : (
-                        <div className="text-center py-5 empty-state-neon w-100">
-                            <FaRoad size={50} className="text-muted mb-3" />
-                            <h4 className="text-muted">Aapne koi ride post nahi ki.</h4>
-                            <p className="text-muted small">Dashboard par jayen aur apni pehli ride offer karein!</p>
-                        </div>
-                    )}
-                </Row>
-            </Container>
+                                        <div className="bg-white/[0.04] border border-white/[0.02] text-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs">
+                                            <FaUsers className="text-[#9dff50]" />
+                                            <span>{ride.seats} Seats</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button 
+                                        className="text-red-400/80 border border-red-500/20 hover:bg-red-500 hover:text-white p-2.5 rounded-xl transition-all duration-200 shadow-sm"
+                                        onClick={() => handleDeleteRide(ride.id)}
+                                    >
+                                        <FaTrash size={13} />
+                                    </button>
+                                </div>
+
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-14 border-2 border-dashed border-white/[0.06] rounded-3xl bg-white/[0.01] w-full flex flex-col items-center justify-center p-6">
+                        <FaRoad size={45} className="text-gray-600 mb-3 opacity-60" />
+                        <h4 className="text-gray-400 font-semibold text-lg">Aapne koi ride post nahi ki.</h4>
+                        <p className="text-gray-500 text-sm max-w-sm mt-1">Dashboard par jayen aur apni pehli ride offer karein!</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

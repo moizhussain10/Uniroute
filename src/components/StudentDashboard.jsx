@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Button, Badge, Form, InputGroup, Spinner, Modal } from 'react-bootstrap';
-import { FaSearch, FaUserCircle, FaMapMarkerAlt, FaHistory, FaStar, FaRoute, FaWallet } from 'react-icons/fa';
+import { FaSearch, FaUserCircle, FaMapMarkerAlt, FaHistory, FaStar, FaRoute } from 'react-icons/fa';
 import { db, auth } from '../config/firebase';
 import { collection, onSnapshot, query, addDoc, serverTimestamp, doc, getDoc, deleteDoc } from 'firebase/firestore';
 // --- Map Imports ---
@@ -8,7 +7,6 @@ import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-lea
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet/dist/leaflet.css';
-import './StudentDashboard.css';
 
 // Leaflet Icon Fix
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -33,8 +31,8 @@ const RoutingMachine = ({ pickupCoords, destCoords }) => {
       addWaypoints: false,
       draggableWaypoints: false,
       fitSelectedRoutes: true,
-      show: false, // Instructions panel ko code level par band karne ke liye
-      createMarker: () => null, // Extra markers ko remove karne ke liye agar zaroorat ho
+      show: false, 
+      createMarker: () => null, 
     }).addTo(map);
 
     return () => map.removeControl(routingControl);
@@ -57,13 +55,12 @@ const StudentDashboard = () => {
   const [userPickupCoords, setUserPickupCoords] = useState([24.8607, 67.0011]);
   const [currentModalFare, setCurrentModalFare] = useState(0);
 
-  // --- NEW: Map Click Handler (Yeh missing tha) ---
+  // --- Map Click Handler Logic (Unchanged) ---
   const MapClickHandler = () => {
     useMapEvents({
       click(e) {
         const coords = [e.latlng.lat, e.latlng.lng];
         setUserPickupCoords(coords);
-        // Jaise hi click ho, Modal ka fare foran update ho jaye
         if (selectedRide) {
           const newFare = calculateFare(coords, selectedRide.destCoords);
           setCurrentModalFare(newFare);
@@ -75,13 +72,12 @@ const StudentDashboard = () => {
 
   const handleOpenMap = (ride) => {
     setSelectedRide(ride);
-    // Initial fare base location se calculate karlo taake khali nazar na aaye
     const initialFare = calculateFare(userPickupCoords, ride.destCoords);
     setCurrentModalFare(initialFare);
     setShowMapModal(true);
   };
 
-  // 1. Fetch User and Rides Data
+  // 1. Fetch User and Rides Data (Unchanged)
   useEffect(() => {
     const fetchUserData = async () => {
       const user = auth.currentUser;
@@ -105,7 +101,7 @@ const StudentDashboard = () => {
     return () => unsubscribe();
   }, []);
 
-  // 2. Timer Logic
+  // 2. Timer Logic (Unchanged)
   useEffect(() => {
     let interval = null;
     let unsubscribeRequest = null;
@@ -121,258 +117,291 @@ const StudentDashboard = () => {
           else if (data.status === "rejected") {
             setActiveRequestId(null);
             setTimer(0);
-            alert("Ride Rjected");
+            alert("Ride Rejected");
           }
-      }
+        }
       });
 
-  interval = setInterval(() => {
-    setTimer((prev) => {
-      if (prev <= 1) {
-        clearInterval(interval);
-        handleCancelRequest(activeRequestId);
-        return 0;
-      }
-      return prev - 1;
-    });
-  }, 1000);
-}
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            handleCancelRequest(activeRequestId);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
 
-return () => {
-  if (interval) clearInterval(interval);
-  if (unsubscribeRequest) unsubscribeRequest();
-};
+    return () => {
+      if (interval) clearInterval(interval);
+      if (unsubscribeRequest) unsubscribeRequest();
+    };
   }, [activeRequestId]);
 
-const handleCancelRequest = async (reqId) => {
-  try {
-    const docRef = doc(db, "requests", reqId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists() && docSnap.data().status === "pending") {
-      await deleteDoc(docRef);
-      alert("Request timed out! Driver ne respond nahi kiya.");
+  const handleCancelRequest = async (reqId) => {
+    try {
+      const docRef = doc(db, "requests", reqId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists() && docSnap.data().status === "pending") {
+        await deleteDoc(docRef);
+        alert("Request timed out! Driver ne respond nahi kiya.");
+      }
+      setActiveRequestId(null);
+      setTimer(0);
+    } catch (e) {
+      console.error("Error:", e);
     }
-    setActiveRequestId(null);
-    setTimer(0);
-  } catch (e) {
-    console.error("Error:", e);
-  }
-};
+  };
 
-const calculateFare = (pickupCoords, destCoords) => {
-  if (!pickupCoords || !destCoords) return 80; // Minimum fare thora barha diya
+  const calculateFare = (pickupCoords, destCoords) => {
+    if (!pickupCoords || !destCoords) return 80;
+    const [lat1, lon1] = pickupCoords;
+    const [lat2, lon2] = destCoords;
+    const R = 6371; 
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const aerialDistance = R * c;
+    const estimatedRoadDistance = aerialDistance * 1.3;
+    const baseFare = 50; 
+    const perKmRate = 25; 
+    const totalFare = Math.round(baseFare + (estimatedRoadDistance * perKmRate));
+    return totalFare < 80 ? 80 : totalFare;
+  };
 
-  const [lat1, lon1] = pickupCoords;
-  const [lat2, lon2] = destCoords;
+  const handleViewRoute = (pickup, destination) => {
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
+    window.open(url, '_blank');
+  };
 
-  const R = 6371; // Earth's radius in km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const handleRequestRide = async () => {
+    const user = auth.currentUser;
+    if (!user || !selectedRide) return;
 
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    try {
+      setRequestingId(selectedRide.id);
+      const docRef = await addDoc(collection(db, "requests"), {
+        rideId: selectedRide.id,
+        driverId: selectedRide.driverId,
+        passengerPhone: userPhone || "No Phone",
+        passengerId: user.uid,
+        passengerName: userName || "Passenger",
+        pickup: selectedRide.pickup,
+        destination: selectedRide.destination,
+        pickupCoords: userPickupCoords,
+        destCoords: selectedRide.destCoords || [24.9462, 67.0681],
+        fare: currentModalFare, 
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const aerialDistance = R * c;
+      setActiveRequestId(docRef.id);
+      setTimer(15);
+      setShowMapModal(false);
+    } catch (e) {
+      console.error("Firestore Error:", e);
+    } finally {
+      setRequestingId(null);
+    }
+  };
 
-  // Road Multiplier: Aerial distance ko 1.3 se multiply kiya (Roads ghoom kar hoti hain)
-  const estimatedRoadDistance = aerialDistance * 1.3;
+  const filteredRides = rides.filter(ride =>
+    ride.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ride.pickup.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const baseFare = 50; // Base rate
-  const perKmRate = 25; // 25 PKR per km
-
-  const totalFare = Math.round(baseFare + (estimatedRoadDistance * perKmRate));
-
-  // Fare hamesha minimum se zyada hona chahiye
-  return totalFare < 80 ? 80 : totalFare;
-};
-
-const handleViewRoute = (pickup, destination) => {
-  const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
-  window.open(url, '_blank');
-};
-
-const handleRequestRide = async () => {
-  const user = auth.currentUser;
-  if (!user || !selectedRide) return;
-
-  try {
-    setRequestingId(selectedRide.id);
-    const docRef = await addDoc(collection(db, "requests"), {
-      rideId: selectedRide.id,
-      driverId: selectedRide.driverId,
-      passengerPhone: userPhone || "No Phone",
-      passengerId: user.uid,
-      passengerName: userName || "Passenger",
-      pickup: selectedRide.pickup,
-      destination: selectedRide.destination,
-      pickupCoords: userPickupCoords,
-      destCoords: selectedRide.destCoords || [24.9462, 67.0681],
-      fare: currentModalFare, // Updated: Modal wala confirmed fare save hoga
-      status: "pending",
-      createdAt: serverTimestamp()
-    });
-
-    setActiveRequestId(docRef.id);
-    setTimer(15);
-    setShowMapModal(false);
-  } catch (e) {
-    console.error("Firestore Error:", e);
-  } finally {
-    setRequestingId(null);
-  }
-};
-
-const filteredRides = rides.filter(ride =>
-  ride.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  ride.pickup.toLowerCase().includes(searchTerm.toLowerCase())
-);
-
-return (
-  <div className="student-dashboard-main">
-    <Container className="py-4">
-      {/* Header Section */}
-      <div className="welcome-section mb-4">
-        <div className="d-flex align-items-center justify-content-between">
-          <div>
-            <h2 className="neon-text-student mb-0">
-              Salam, {userName ? userName.split(' ')[0] : "Student"}! 👋
-            </h2>
-            <p className="text-muted">Where are we going today?</p>
+  return (
+    <div className="bg-[#0b0b0b] min-h-screen text-white pb-20 font-sans selection:bg-[#9dff50] selection:text-black">
+      <div className="max-w-[1200px] mx-auto px-4 py-6">
+        
+        {/* Header Section */}
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-[#9dff50] text-2xl md:text-3xl font-extrabold uppercase tracking-wide">
+                Salam, {userName ? userName.split(' ')[0] : "Student"}! 👋
+              </h2>
+              <p className="text-[#666666] text-sm mt-1">Where are we going today?</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Quick Stats */}
-      <Row className="mb-4 g-3">
-        <Col xs={6} md={3}>
-          <div className="mini-stat-card">
-            <FaRoute className="stat-icon" />
-            <span>Available</span>
-            <h5>{rides.length} Rides</h5>
+        {/* Quick Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white/[0.02] border !border-gray-700 p-[18px] rounded-[20px] backdrop-blur-md">
+            <FaRoute className="text-[#9dff50] text-xl mb-3" />
+            <span className="text-[#666666] text-[11px] uppercase tracking-wider block">Available</span>
+            <h5 className="text-white text-lg font-extrabold mt-1">{rides.length} Rides</h5>
           </div>
-        </Col>
-        <Col xs={6} md={3}>
-          <div className="mini-stat-card">
-            <FaHistory className="stat-icon" />
-            <span>Recent</span>
-            <h5>04 Trips</h5>
+          <div className="bg-white/[0.02] border !border-gray-700 p-[18px] rounded-[20px] backdrop-blur-md">
+            <FaHistory className="text-[#9dff50] text-xl mb-3" />
+            <span className="text-[#666666] text-[11px] uppercase tracking-wider block">Recent</span>
+            <h5 className="text-white text-lg font-extrabold mt-1">04 Trips</h5>
           </div>
-        </Col>
-      </Row>
+        </div>
 
-      {/* Search Bar */}
-      <div className="search-wrapper mb-5">
-        <InputGroup className="neon-search-group shadow-sm">
-          <InputGroup.Text><FaSearch /></InputGroup.Text>
-          <Form.Control
-            placeholder="Search by area (e.g. Gulshan, KU...)"
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </InputGroup>
-      </div>
+        {/* Search Bar */}
+        <div className="mb-8">
+          <div className="flex items-center bg-[#121212] border border-[#222222] rounded-[16px] overflow-hidden focus-within:border-[#9dff50] focus-within:shadow-[0_0_20px_rgba(157,255,80,0.15)] transition-all duration-300">
+            <span className="text-[#9dff50] pl-[18px] pr-2">
+              <FaSearch size={16} />
+            </span>
+            <input
+              type="text"
+              placeholder="Search by area (e.g. Gulshan, KU...)"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-transparent text-white border-none outline-none py-3.5 px-3 text-[15px] placeholder-[#555555]"
+            />
+          </div>
+        </div>
 
-      {/* Rides Grid */}
-      <h5 className="section-label mb-3">Live Commutes</h5>
-      <Row className="g-4">
+        {/* Rides Grid */}
+        <h5 className="text-[#444444] text-[11px] uppercase tracking-[2px] font-extrabold mb-4">Live Commutes</h5>
+        
         {loading ? (
-          <div className="text-center w-100 py-5">
-            <Spinner animation="border" style={{ color: '#9dff50' }} />
+          <div className="flex justify-center items-center w-full py-20">
+            {/* Custom Tailwind Neon Spinner */}
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent border-[#9dff50]"></div>
           </div>
-        ) : filteredRides.map((ride) => (
-          <Col key={ride.id} xs={12} md={6} lg={4}>
-            <Card className="glass-ride-card h-100">
-              <Card.Body className="d-flex flex-column">
-                {/* Driver Info Header */}
-                <div className="d-flex justify-content-between align-items-start mb-3">
-                  <div className="d-flex align-items-center">
-                    <div className="driver-avatar-ring"><FaUserCircle size={32} /></div>
-                    <div className="ms-3">
-                      <h6 className="driver-name mb-0">{ride.driverName || "Driver"}</h6>
-                      <div className="rating-box"><FaStar className="me-1" />4.9</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredRides.map((ride) => (
+              <div 
+                key={ride.id} 
+                className="bg-white/[0.02] border !border-gray-700 rounded-[24px] p-6 backdrop-blur-[12px] flex flex-col justify-between transition-all duration-300 cubic-bezier-[0.4,0,0.2,1] hover:-translate-y-1.5 hover:border-[#9dff50]/40 hover:shadow-[0_12px_30px_rgba(157,255,80,0.08)]"
+              >
+                <div>
+                  {/* Driver Info Header */}
+                  <div className="flex justify-between items-start mb-[20px]">
+                    <div className="flex items-center">
+                      <div className="w-[46px] height-[46px] bg-[#141414] border-2 border-[#9dff50] rounded-full flex items-center justify-center text-[#9dff50] shadow-[0_0_10px_rgba(157,255,80,0.2)]">
+                        <FaUserCircle size={32} />
+                      </div>
+                      <div className="ml-3">
+                        <h6 className="text-white font-bold text-sm mb-0">{ride.driverName || "Driver"}</h6>
+                        <div className="text-[#ffc107] text-[11px] font-semibold mt-0.5 flex items-center">
+                          <FaStar className="mr-1" />4.9
+                        </div>
+                      </div>
+                    </div>
+                    <span className="bg-[#9dff50]/10 text-[#9dff50] border border-[#9dff50]/30 text-[10px] font-extrabold tracking-[1.5px] px-2.5 py-1 rounded-[6px] uppercase">
+                      LIVE
+                    </span>
+                  </div>
+
+                  {/* Route Flow Graphic Structure inside Tailwind */}
+                  <div className="relative pl-5 my-6">
+                    {/* Vertical neon connecting line */}
+                    <div className="absolute left-[4px] top-[6px] bottom-[6px] w-[2px] bg-gradient-to-b from-[#9dff50] to-[#9dff50]/20"></div>
+                    {/* Glowing indicator dot */}
+                    <div className="absolute left-0 top-[4px] w-2.5 h-2.5 bg-[#9dff50] rounded-full shadow-[0_0_8px_#9dff50]"></div>
+                    
+                    <div className="text-left">
+                      <small className="text-[#666666] text-[10px] font-bold tracking-wider block mb-1">DROP-OFF POINT</small>
+                      <p className="text-[#e0e0e0] text-sm font-medium line-clamp-1 truncate">{ride.destination}</p>
                     </div>
                   </div>
-                  <Badge className="live-pill">LIVE</Badge>
                 </div>
 
-                <div className="route-flow flex-grow-1">
-                  <div className="flow-content">
-                    <div className="flow-item">
-                      <small>DROP-OFF POINT</small>
-                      <p className="text-white text-truncate">{ride.destination}</p>
+                {/* Fare & Buttons Footer */}
+                <div className="mt-4 pt-4 border-t border-white/[0.03]">
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <span className="bg-sky-500/10 text-sky-400 text-[10px] font-bold px-2 py-0.5 rounded mb-1 inline-block">Tap to set pickup</span>
+                      <h5 className="text-[#888888] text-sm font-medium mt-0.5">Fare: Check in Map</h5>
                     </div>
-                  </div>
-                </div>
-
-                <div className="fare-footer mt-4">
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div className="fare-info">
-                      <Badge bg="info" className="mb-1">Tap to set pickup</Badge>
-                      <h5 className="text-muted">Fare: Check in Map</h5>
-                    </div>
-                    <Button
-                      variant="outline-light"
-                      className="btn-map-glass"
+                    <button
                       onClick={() => handleViewRoute(ride.pickup, ride.destination)}
+                      className="border border-white/10 bg-white/[0.03] text-[#cccccc] rounded-[12px] p-2.5 transition-all duration-200 hover:bg-white/[0.08] hover:text-white hover:border-white/20"
                     >
-                      <FaMapMarkerAlt />
-                    </Button>
+                      <FaMapMarkerAlt size={16} />
+                    </button>
                   </div>
 
-                  <Button
-                    className="btn-request-neon w-100"
+                  <button
                     disabled={activeRequestId !== null}
                     onClick={() => handleOpenMap(ride)}
+                    className="w-full bg-[#9dff50] text-black !rounded-2xl py-3.5 px-5 font-black text-[13px] tracking-wide uppercase transition-all duration-300 cubic-bezier-[0.4,0,0.2,1] hover:enabled:-translate-y-0.5 hover:enabled:bg-[#a6ff5e] hover:enabled:shadow-[0_6px_20px_rgba(157,255,80,0.4)] disabled:bg-[#222222] disabled:text-[#555555] disabled:border disabled:border-[#333333] disabled:cursor-not-allowed"
                   >
                     {activeRequestId ? `Waiting ${timer}s...` : "SELECT PICKUP & BOOK"}
-                  </Button>
+                  </button>
                 </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    </Container>
-
-    {/* Map Modal (Updated with Live Fare) */}
-    <Modal show={showMapModal} onHide={() => setShowMapModal(false)} centered size="lg">
-      <Modal.Header closeButton className="bg-dark text-white border-0 py-2">
-        <Modal.Title className="fs-6 neon-text-green">CONFIRM YOUR PICKUP</Modal.Title>
-      </Modal.Header>
-      <Modal.Body className="p-0 bg-dark position-relative">
-        <div style={{ height: '400px' }}>
-          {selectedRide && (
-            <MapContainer center={selectedRide.pickupCoords} zoom={14} style={{ height: '100%' }}>
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <RoutingMachine pickupCoords={selectedRide.pickupCoords} destCoords={selectedRide.destCoords} />
-              <MapClickHandler />
-            </MapContainer>
-          )}
-        </div>
-
-        {/* Fare Floating Overlay inside Modal */}
-        <div className="fare-overlay p-3">
-          <div className="d-flex justify-content-between align-items-center bg-black p-3 rounded border border-success shadow-lg">
-            <div>
-              <small className="text-secondary d-block">ESTIMATED FARE</small>
-              <h3 className="text-white mb-0">Rs. {currentModalFare}</h3>
-            </div>
-            <div className="text-end">
-              <small className="text-secondary d-block">DISTANCE IMPACT</small>
-              <span className="badge bg-success">Student Discount Applied</span>
-            </div>
+              </div>
+            ))}
           </div>
-          <p className="text-center text-secondary small mt-2">
-            Click on the map to mark your exact pickup location.
-          </p>
-          <Button className="btn-request-neon w-100 py-3 fw-bold mt-2" onClick={handleRequestRide}>
-            CONFIRM RIDE @ Rs. {currentModalFare}
-          </Button>
+        )}
+      </div>
+
+      {/* --- Pure Tailwind Map Modal --- */}
+      {showMapModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          {/* Modal Backdrop overlay */}
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowMapModal(false)}></div>
+          
+          {/* Modal Box Container */}
+          <div className="bg-[#111111] border border-white/10 rounded-[24px] w-full max-w-[800px] overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] z-10 relative">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center bg-[#161616] px-5 py-3 border-b border-white/[0.05]">
+              <h3 className="text-[#9dff50] text-xs font-black uppercase tracking-wider">CONFIRM YOUR PICKUP</h3>
+              <button onClick={() => setShowMapModal(false)} className="text-gray-400 hover:text-white text-lg font-bold outline-none">&times;</button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="relative bg-[#0d0d0d]">
+              <div className="h-[400px] w-full relative z-0">
+                {selectedRide && (
+                  <MapContainer center={selectedRide.pickupCoords} zoom={14} style={{ height: '100%', width: '100%' }}>
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <RoutingMachine pickupCoords={selectedRide.pickupCoords} destCoords={selectedRide.destCoords} />
+                    <MapClickHandler />
+                  </MapContainer>
+                )}
+              </div>
+
+              {/* Fare Floating Overlay Area */}
+              <div className="p-4 bg-gradient-to-t from-black via-black/95 to-transparent pt-10">
+                <div className="flex justify-between items-center bg-black p-4 rounded-xl border border-emerald-500/30 shadow-2xl">
+                  <div>
+                    <small className="text-[#666666] text-[10px] tracking-wider block uppercase font-bold">ESTIMATED FARE</small>
+                    <h3 className="text-white text-2xl font-black mt-0.5">Rs. {currentModalFare}</h3>
+                  </div>
+                  <div className="text-end">
+                    <small className="text-[#666666] text-[10px] tracking-wider block uppercase font-bold">DISTANCE IMPACT</small>
+                    <span className="bg-emerald-500/10 text-emerald-400 text-[11px] font-extrabold px-2.5 py-1 rounded border border-emerald-500/20 inline-block mt-1">
+                      Student Discount Applied
+                    </span>
+                  </div>
+                </div>
+                
+                <p className="text-center text-[#666666] text-xs mt-3">
+                  Click on the map to mark your exact pickup location.
+                </p>
+                
+                <button 
+                  onClick={handleRequestRide}
+                  className="w-full bg-[#9dff50] text-black rounded-[14px] py-4 font-black text-sm uppercase tracking-wide mt-3 shadow-[0_0_20px_rgba(157,255,80,0.2)] hover:bg-[#a6ff5e] transition-all active:scale-[0.99]"
+                >
+                  CONFIRM RIDE @ Rs. {currentModalFare}
+                </button>
+              </div>
+            </div>
+
+          </div>
         </div>
-      </Modal.Body>
-    </Modal>
-  </div>
-);
+      )}
+
+      {/* Leaflet Override to hide panel safely using utility inline styles or tailwind global inject */}
+      <style>{`
+        .leaflet-routing-container { display: none !important; }
+        .leaflet-top, .leaflet-bottom { z-index: 800 !important; }
+      `}</style>
+    </div>
+  );
 };
 
 export default StudentDashboard;

@@ -1,3 +1,20 @@
+/* Custom Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* Base Stylings */
 body {
     background-color: #050505;
     background-image:
@@ -7,23 +24,34 @@ body {
     color: white;
 }
 
+/* Glassmorphism Layout Layers */
 .glass-nav {
-
-    .links{
-        list-style-type: none;
-    }
     background: rgba(5, 5, 5, 0.75);
     backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-nav .links {
+    list-style-type: none;
+    text-decoration: none;
 }
 
 .glass-card {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.glass-card:hover {
+    background: rgba(16, 185, 129, 0.05);
+    border-color: rgba(16, 185, 129, 0.3);
+    transform: translateY(-6px);
+}
+
+/* Interactive Neon UI Modifiers */
 .btn-glow:hover {
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
     transform: scale(1.02);
@@ -35,51 +63,25 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-.tab-content {
-    transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-
-
-
-body {
-    background-color: #050505;
-    font-family: 'Inter', sans-serif;
-    color: white;
-}
-
-.glass-card {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 2.5rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.glass-card:hover {
-    background: rgba(16, 185, 129, 0.05);
-    border-color: rgba(16, 185, 129, 0.3);
-    transform: translateY(-10px);
-}
-
 .service-tag {
     background: rgba(16, 185, 129, 0.1);
     color: #10b981;
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 99px;
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
+    display: inline-block;
 }
 
 .arrow-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-top: 15px;
     font-weight: 600;
     color: #10b981;
+    text-decoration: none;
     transition: gap 0.3s ease;
 }
 
@@ -87,16 +89,13 @@ body {
     gap: 15px;
 }
 
-.links{
-    list-style-type: none;
-    text-decoration: none;
-    color: white;
+/* Footer Neon Rings Blur Effect */
+footer .absolute.border-emerald-500\/20 {
+    filter: blur(8px); /* Rings ki outer edge ko soft karne ke liye */
+    background: radial-gradient(circle at center, transparent 60%, rgba(16, 185, 129, 0.03) 100%);
+    pointer-events: none;
 }
 
-.signup_btn{
-    border-radius: 25px;
-}
-
-.getrides-btn{
-    border-radius: 10px;
+footer .absolute.border-emerald-500\/10 {
+    filter: blur(12px); /* Inner ring ko mazeed diffuse karne ke liye */
 }

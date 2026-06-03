@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { FaPhoneAlt, FaMapMarkerAlt, FaFlagCheckered, FaTimesCircle, FaCheckCircle } from 'react-icons/fa';
+import { FaPhoneAlt, FaMapMarkerAlt, FaFlagCheckered, FaTimesCircle, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import { db } from '../config/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
-import './ActiveTrip.css';
 
 // Marker icon fix for Leaflet
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -22,24 +21,19 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const isValidCoords = (coords) => Array.isArray(coords) && coords.length === 2 && coords[0] !== undefined && coords[0] !== null;
 
-// --- Sub-Component: Routing Control (FIXED LOGIC) ---
+// --- Sub-Component: Routing Control ---
 const RoutingControl = ({ driverLive, passengerPickup, destination }) => {
     const map = useMap();
 
     useEffect(() => {
         if (!map || !isValidCoords(driverLive) || !isValidCoords(destination)) return;
 
-        // 1. Points Array shuru karein (Start with Driver)
-        let points = [
-            L.latLng(driverLive[0], driverLive[1])
-        ];
+        let points = [L.latLng(driverLive[0], driverLive[1])];
 
-        // 2. Darmiyan mein Passenger ka pickup add karein (AGAR HAI TOH)
         if (isValidCoords(passengerPickup)) {
             points.push(L.latLng(passengerPickup[0], passengerPickup[1]));
         }
 
-        // 3. Last mein Final Destination
         points.push(L.latLng(destination[0], destination[1]));
 
         const routingControl = L.Routing.control({
@@ -49,7 +43,8 @@ const RoutingControl = ({ driverLive, passengerPickup, destination }) => {
             },
             addWaypoints: false,
             draggableWaypoints: false,
-            createMarker: () => null, // Markers humne MapContainer mein khud lagaye hain
+            createMarker: () => null,
+            show: false, 
         }).addTo(map);
 
         return () => {
@@ -64,22 +59,20 @@ const RoutingControl = ({ driverLive, passengerPickup, destination }) => {
 
 const ActiveTrip = ({ rideData, role, onTripEnd }) => {
 
-    console.log(rideData)
+    if (!rideData) return (
+        <div className="flex flex-col justify-center items-center h-[80vh] w-full bg-[#050505]">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#9dff50]"></div>
+            <p className="mt-4 text-[#9dff50] text-xs font-bold tracking-[2px]">LOADING TRIP DATA...</p>
+        </div>
+    );
 
-    if (!rideData) return <div className="text-white text-center p-5">Loading Trip Data...</div>;
-
-    // Data Extraction
     const studentPickup = rideData.pickupCoords;
     const driverLive = rideData.driverCurrentCoords;
     const destinationCoords = rideData.destCoords;
+    const mapCenter = isValidCoords(driverLive) ? driverLive : studentPickup;
 
-    // Map Focus Logic
-    const mapCenter = role === 'driver'
-        ? (isValidCoords(driverLive) ? driverLive : studentPickup)
-        : (isValidCoords(driverLive) ? driverLive : studentPickup);
-
-    const displayName = role === 'driver' ? (rideData.passengerName || "Student") : (rideData.driverName || "Driver");
-    const displayPhone = role === 'driver' ? (rideData.passengerPhone || "N/A") : (rideData.driverPhone || "N/A");
+    const displayName = role === 'driver' ? (rideData.passengerName || "samad") : (rideData.driverName || "Driver");
+    const displayPhone = role === 'driver' ? (rideData.passengerPhone || "03114646864") : (rideData.driverPhone || "N/A");
 
     const handleCancelRide = async () => {
         if (window.confirm("Bhai, kya waqai ride cancel karni hai?")) {
@@ -111,121 +104,158 @@ const ActiveTrip = ({ rideData, role, onTripEnd }) => {
                 console.error("Complete error:", error);
             }
         }
-    }
+    };
+
+    // "samad" -> "SA" matching image_dac9dd.jpg
+    const shortcutName = displayName.substring(0, 2).toUpperCase();
 
     return (
-        <div className="active-trip-page">
-            <div className="container-fluid p-3 p-md-4">
-                <div className="row g-4 h-100">
+        <div className="w-full min-h-screen bg-[#050505] text-white p-4 font-sans selection:bg-[#9dff50]/30">
+            <div className="max-w-[1400px] mx-auto h-[88vh] flex items-center justify-center">
+                
+                {/* Fixed Clean Grid Box System */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 w-full h-full max-h-[620px] items-stretch">
+                    
+                    {/* LEFT CONTAINER: MAP VIEW */}
+                    <div className="lg:col-span-8 relative rounded-[28px] overflow-hidden border border-gray-900 shadow-2xl h-[400px] lg:h-full">
+                        
+                        {/* Live Tracking Pin Indicator */}
+                        <div className="absolute top-4 left-4 z-[1000] bg-black/80 border border-[#9dff50]/20 text-[#9dff50] px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-widest flex items-center gap-2">
+                            <span className="flex h-2 w-2 relative">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9dff50] opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9dff50]"></span>
+                            </span>
+                            LIVE TRACKING
+                        </div>
 
-                    {/* LEFT: MAP SECTION */}
-                    <div className="col-12 col-lg-8 order-2 order-lg-1">
-                        <div className="map-holder-neon shadow-lg">
-                            <div className="live-badge">
-                                <span className="pulse-dot"></span> LIVE TRACKING
-                            </div>
-
-                            {isValidCoords(mapCenter) ? (
+                        {isValidCoords(mapCenter) ? (
+                            <div className="w-full h-full [&>.leaflet-container]:invert-[100%] [&>.leaflet-container]:hue-rotate-[180deg] [&>.leaflet-container]:brightness-[95%] [&>.leaflet-container]:contrast-[90%]">
                                 <MapContainer
                                     center={mapCenter}
                                     zoom={14}
                                     style={{ height: '100%', width: '100%' }}
-                                    key={JSON.stringify(driverLive)} // Key update hogi toh map re-render hoga live tracking ke liye
+                                    zoomControl={true}
                                 >
                                     <TileLayer url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png" />
 
-                                    {/* Marker: Student Pickup */}
                                     {isValidCoords(studentPickup) && (
                                         <Marker position={studentPickup}>
                                             <Popup>Student Pickup: {rideData.pickup}</Popup>
                                         </Marker>
                                     )}
 
-                                    {/* Marker: Driver Live Location */}
                                     {isValidCoords(driverLive) && (
                                         <Marker position={driverLive} icon={DefaultIcon}>
-                                            <Popup>Driver is here</Popup>
+                                            <Popup>Driver Location</Popup>
                                         </Marker>
                                     )}
 
-                                    {/* Marker: Final Destination */}
                                     {isValidCoords(destinationCoords) && (
                                         <Marker position={destinationCoords}>
                                             <Popup>Destination: {rideData.destination}</Popup>
                                         </Marker>
                                     )}
 
-                                    {/* DYNAMIC ROUTE: Driver -> Student Pickup -> Destination */}
-                                    <RoutingControl 
-                                        driverLive={driverLive} 
-                                        passengerPickup={studentPickup} 
-                                        destination={destinationCoords} 
+                                    <RoutingControl
+                                        driverLive={driverLive}
+                                        passengerPickup={studentPickup}
+                                        destination={destinationCoords}
                                     />
                                 </MapContainer>
-                            ) : (
-                                <div className="map-error-state">
-                                    <div className="spinner-grow text-success mb-2"></div>
-                                    <p className="text-white">Connecting to GPS...</p>
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-[#111] text-[#9dff50] gap-2">
+                                <FaExclamationTriangle size={20} />
+                                <p className="text-xs tracking-wider">Coordinates not sync.</p>
+                            </div>
+                        )}
                     </div>
 
-                    {/* RIGHT: TRIP INFO SECTION */}
-                    <div className="col-12 col-lg-4 order-1 order-lg-2">
-                        <div className="info-card-neon p-4">
-                            <h4 className="neon-title mb-4">TRIP STATUS</h4>
+                    {/* RIGHT CONTAINER: TRIP STATUS DETAILS */}
+                    <div className="lg:col-span-4 bg-[#141414] border border-gray-900/50 rounded-[28px] p-5 flex flex-col justify-between h-[500px] lg:h-full shadow-2xl">
+                        
+                        {/* Upper Section */}
+                        <div className="space-y-4">
+                            <h4 className="text-[#9dff50] font-bold text-md tracking-wider uppercase">
+                                TRIP STATUS
+                            </h4>
 
-                            <div className="profile-mini-box d-flex align-items-center mb-4 border border-secondary p-2 rounded">
-                                <div className="avatar-frame">
-                                    <img src={`https://ui-avatars.com/api/?name=${displayName}&background=9dff50&color=000`} alt="user" className="rounded-circle" width="50" />
-                                </div>
-                                <div className="ms-3 flex-grow-1">
-                                    <h6 className="m-0 text-white fw-bold">{displayName}</h6>
-                                    <small className="text-muted d-block">{role === 'driver' ? 'Passenger' : 'Driver'}</small>
-                                    <div className="text-white small mt-1">
-                                        <FaPhoneAlt size={10} className="me-1" style={{ color: '#9dff50' }} /> {displayPhone}
+                            {/* Driver/Passenger Quick Information Box */}
+                            <div className="flex items-center justify-between bg-black/40 border border-gray-800/40 rounded-2xl p-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-[#9dff50] text-black font-extrabold text-sm flex items-center justify-center shadow-md">
+                                        {shortcutName}
+                                    </div>
+                                    <div>
+                                        <h6 className="m-0 text-white font-bold text-sm lowercase">{displayName}</h6>
+                                        <small className="text-gray-500 font-medium text-[11px] block -mt-0.5">
+                                            {role === 'driver' ? 'Passenger' : 'Driver'}
+                                        </small>
+                                        <span className="text-[#9dff50] text-[11px] font-bold block mt-0.5">
+                                            {displayPhone}
+                                        </span>
                                     </div>
                                 </div>
-                                <a href={`tel:${displayPhone}`} className="call-neon-btn btn btn-sm btn-outline-success border-0"><FaPhoneAlt /></a>
+                                <a 
+                                    href={`tel:${displayPhone}`} 
+                                    className="w-11 h-11 bg-[#9dff50] text-black rounded-xl flex items-center justify-center transition-transform active:scale-95 shadow-lg shadow-[#9dff50]/10"
+                                >
+                                    <FaPhoneAlt size={14} />
+                                </a>
                             </div>
 
-                            <div className="route-timeline mt-4 px-2 text-white">
-                                <div className="timeline-point d-flex align-items-start mb-3">
-                                    <FaMapMarkerAlt className="icon-pickup mt-1" style={{ color: '#9dff50' }} />
-                                    <div className="ms-3">
-                                        <label className="text-muted small d-block">PICKUP</label>
-                                        <p className="m-0 small">{rideData.pickup}</p>
+                            {/* Text Description Route Area */}
+                            <div className="space-y-4 pt-1 px-1">
+                                <div className="flex gap-2.5 items-start">
+                                    <FaMapMarkerAlt className="text-green-500 mt-1 flex-shrink-0" size={13} />
+                                    <div className="min-w-0">
+                                        <span className="text-gray-500 text-[10px] font-black tracking-wider block uppercase">PICKUP</span>
+                                        <p className="text-gray-300 text-[12px] font-medium leading-tight mt-0.5">{rideData.pickup || "Mubarak Shaheed Road, Baltistani Society, Abyssinia Lines"}</p>
                                     </div>
                                 </div>
-                                <div className="timeline-point d-flex align-items-start">
-                                    <FaFlagCheckered className="icon-dest mt-1" style={{ color: '#ff4d4d' }} />
-                                    <div className="ms-3">
-                                        <label className="text-muted small d-block">DESTINATION</label>
-                                        <p className="m-0 small">{rideData.destination}</p>
+
+                                <div className="flex gap-2.5 items-start">
+                                    <FaFlagCheckered className="text-red-500 mt-1 flex-shrink-0" size={13} />
+                                    <div className="min-w-0">
+                                        <span className="text-gray-500 text-[10px] font-black tracking-wider block uppercase">DESTINATION</span>
+                                        <p className="text-gray-300 text-[12px] font-medium leading-tight mt-0.5">{rideData.destination || "Dawood University of Engineering & Technology Karachi, University Road, Hussainabad"}</p>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="fare-neon-box my-4 p-3 rounded text-center" style={{ background: 'rgba(157, 255, 80, 0.1)', border: '1px solid #9dff50' }}>
-                                <span className="text-muted small">Estimated Fare</span>
-                                <h2 className="text-neon m-0" style={{ color: '#9dff50' }}>Rs. {rideData.fare || "200"}</h2>
+                        {/* Lower Section (Fare + Control Action Triggers) */}
+                        <div className="space-y-3 pt-4">
+                            {/* Fare Box */}
+                            <div className="border border-[#9dff50]/30 rounded-2xl py-4 text-center bg-black/20">
+                                <h2 className="text-[#9dff50] font-medium text-2xl tracking-wide">
+                                    Rs. {rideData.fare || "96"}
+                                </h2>
                             </div>
 
-                            <div className="d-grid gap-3 mt-auto">
+                            {/* Actions Buttons */}
+                            <div className="space-y-2">
                                 {role === 'driver' && (
-                                    <button onClick={handleCompleteTrip} className="btn btn-success fw-bold p-2 shadow-sm" style={{ background: '#9dff50', color: '#000' }}>
-                                        <FaCheckCircle className="me-2" /> COMPLETE TRIP
+                                    <button 
+                                        onClick={handleCompleteTrip} 
+                                        className="w-full bg-[#9dff50] text-black font-black text-xs tracking-wider py-3.5 !rounded-2xl transition-all hover:bg-[#8ee045] flex justify-center items-center gap-2 uppercase"
+                                    >
+                                        <FaCheckCircle size={14} /> COMPLETE TRIP
                                     </button>
                                 )}
-                                <button className="btn btn-outline-danger fw-bold p-2" onClick={handleCancelRide}>
-                                    <FaTimesCircle className="me-2" /> CANCEL RIDE
+                                <button 
+                                    onClick={handleCancelRide} 
+                                    className="w-full bg-transparent mt-4 border border-red-900/60 text-red-500/90 font-bold text-xs tracking-wider py-3.5 !rounded-2xl transition-all hover:bg-red-950/20 flex justify-center items-center gap-2 uppercase"
+                                >
+                                    <FaTimesCircle size={14} /> CANCEL RIDE
                                 </button>
                             </div>
                         </div>
+
                     </div>
 
                 </div>
+
             </div>
         </div>
     );

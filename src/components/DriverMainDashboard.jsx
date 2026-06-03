@@ -50,28 +50,37 @@ const DriverMainDashboard = () => {
     }
   };
 
-  return (
-    <div className="app-layout" style={{ display: 'flex', backgroundColor: '#000', minHeight: '100vh' }}>
-      <Sidebar role="driver" activeTab={activeTab} setActiveTab={setActiveTab} />
+return (
+  <div className="app-layout" style={{ display: 'flex', backgroundColor: '#000', minHeight: '100vh' }}>
+    <Sidebar role="driver" activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div className="dashboard-main-content" style={{ flexGrow: 1, padding: '20px' }}>
-        {currentRide ? (
-          /* ActiveTrip ko handleEndTrip pass karein */
-          <ActiveTrip 
-            rideData={currentRide} 
-            role="driver" 
-            onTripEnd={() => handleEndTrip(currentRide.id)} 
-          />
-        ) : (
-          <>
-            {activeTab === 'home' && <DriverDashboard />}
-            {activeTab === 'myrides' && <MyRides />}
-            {activeTab === 'profile' && <DriverProfile />}
-          </>
-        )}
-      </div>
+    {/* 👇 Yahan style aur className mein margin-left add kiya hai taake content sidebar ke aage se shuru ho */}
+    <div 
+      className="dashboard-main-content lg:pl-64 w-full" 
+      style={{ 
+        flexGrow: 1, 
+        padding: '20px',
+        marginLeft: window.innerWidth > 1024 ? '260px' : '0px', // Large screens par sidebar ki jagah chhorega
+        width: '100%',
+        minWidth: 0 // Kisi bhi grid overflow ko rokne ke liye
+      }}
+    >
+      {currentRide ? (
+        <ActiveTrip 
+          rideData={currentRide} 
+          role="driver" 
+          onTripEnd={() => handleEndTrip(currentRide.id)} 
+        />
+      ) : (
+        <>
+          {activeTab === 'home' && <DriverDashboard />}
+          {activeTab === 'myrides' && <MyRides />}
+          {activeTab === 'profile' && <DriverProfile />}
+        </>
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default DriverMainDashboard;

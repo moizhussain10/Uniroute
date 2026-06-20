@@ -5,7 +5,9 @@ import { auth, db, onAuthStateChanged } from '../config/firebase';
 import { collection, addDoc, query, where, onSnapshot, doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import L from 'leaflet';
 import { FaSearch, FaMapMarkerAlt, FaCar, FaClock, FaUsers, FaBell } from 'react-icons/fa';
-import { Spinner, Button } from 'react-bootstrap';
+
+// 🔥 TOAST IMPORTS
+import toast, { Toaster } from 'react-hot-toast';
 
 // Notification Sound Logic
 const notificationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
@@ -162,11 +164,17 @@ const DriverDashboard = () => {
                 setTempPos(newCoords);
                 handleLocationSelect(newCoords);
             } else {
-                alert("Location not found! 📍");
+                // 🔥 Toast added
+                toast.error("Location not found! 📍", {
+                    style: { background: '#141414', color: '#ff4b4b', border: '1px solid #333' }
+                });
             }
         } catch (error) {
             console.error("Search failed:", error);
-            alert("Search service error");
+            // 🔥 Toast added
+            toast.error("Search service error", {
+                style: { background: '#141414', color: '#ff4b4b', border: '1px solid #333' }
+            });
         }
     };
 
@@ -185,7 +193,10 @@ const DriverDashboard = () => {
                     });
 
                     setActiveTripId(requestId);
-                    alert("Ride Accepted! Tracking started.");
+                    // 🔥 Toast added
+                    toast.success("Ride Accepted! Tracking started. 📡", {
+                        style: { background: '#141414', color: '#9dff50', border: '1px solid #333' }
+                    });
                 });
             } else {
                 await updateDoc(doc(db, "requests", requestId), { status: action });
@@ -198,7 +209,12 @@ const DriverDashboard = () => {
     // 🔥 7. UPDATE POST RIDE (Initial setup)
     const handlePostRide = async (e) => {
         e.preventDefault();
-        if (!pickup.coords || !dest.coords) return alert("Please select both locations!");
+        if (!pickup.coords || !dest.coords) {
+            // 🔥 Toast added
+            return toast.error("Please select both locations!", {
+                style: { background: '#141414', color: '#ff4b4b', border: '1px solid #333' }
+            });
+        }
         setLoading(true);
         try {
             const form = e.target;
@@ -218,8 +234,16 @@ const DriverDashboard = () => {
                 status: 'available',
                 createdAt: serverTimestamp()
             });
-            alert("Ride Posted! 🚀");
-        } catch (err) { alert("Error: " + err.message); }
+            // 🔥 Toast added
+            toast.success("Ride Posted Successfully! 🚀", {
+                style: { background: '#141414', color: '#9dff50', border: '1px solid #333' }
+            });
+        } catch (err) { 
+            // 🔥 Toast added
+            toast.error("Error: " + err.message, {
+                style: { background: '#141414', color: '#ff4b4b', border: '1px solid #333' }
+            });
+        }
         setLoading(false);
     };
 
@@ -246,11 +270,14 @@ const DriverDashboard = () => {
 
     return (
         <div 
-            className="min-h-screen p-4 md:p-6 text-white relative overflow-x-hidden bg-cover bg-center bg-no-repeat lg:pl-[260px]"
+            className="min-h-screen p-4 md:p-6 text-white relative overflow-x-hidden bg-cover bg-center bg-no-repeat"
             style={{ 
                 backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), url('https://static.vecteezy.com/system/resources/thumbnails/053/733/164/small/perfect-close-up-of-a-modern-car-showcasing-its-intricate-design-photo.jpg')`
             }}
         >
+            {/* 🔥 TOASTER LAYER ADDED HERE */}
+            <Toaster position="top-right" reverseOrder={false} />
+
             {/* Grid Layout Container */}
             <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 h-auto lg:h-[85vh] items-stretch">
                 
@@ -358,7 +385,7 @@ const DriverDashboard = () => {
                                 disabled={loading} 
                                 className="w-full bg-gradient-to-r from-[#9dff50] to-[#7ed93d] text-black font-extrabold tracking-wider uppercase !rounded-2xl p-4 mt-4 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-[0_10px_25px_rgba(157,255,80,0.4)] active:translate-y-0 relative overflow-hidden group disabled:opacity-50"
                             >
-                                {loading ? <Spinner size="sm" /> : "POST RIDE NOW"}
+                                {loading ? "loading" : "POST RIDE NOW"}
                                 <span className="absolute inset-0 w-200% h-200% bg-white/20 transform rotate-45 -top-1/2 -left-1/2 transition-all duration-700 pointer-events-none group-hover:left-[120%]" />
                             </button>
                         </form>
@@ -408,7 +435,6 @@ const DriverDashboard = () => {
                         {/* Notification Ticker Header */}
                         <div className="bg-[#9dff50]/10 px-4 py-2.5 border-b border-[#9dff50]/20 flex justify-between items-center text-[#9dff50] font-black text-[11px] tracking-wider">
                             <div className="flex items-center gap-2">
-                                <Spinner animation="grow" size="sm" variant="success" className="m-0" />
                                 <span>NEW RIDE REQUEST</span>
                             </div>
                             <FaBell className="text-xs" />
@@ -435,22 +461,22 @@ const DriverDashboard = () => {
 
                         {/* Action CTA Buttons */}
                         <div className="p-3 bg-white/5 border-t !border-gray-700 flex gap-2">
-                            <Button
+                            <button
                                 variant="success"
                                 size="sm"
                                 className="w-full font-bold uppercase text-[11px] py-2 tracking-wider bg-emerald-500 border-none text-black hover:bg-emerald-400"
                                 onClick={() => handleAction(req.id, 'accepted')}
                             >
                                 ACCEPT & EARN
-                            </Button>
-                            <Button
+                            </button>
+                            <button
                                 variant="outline-danger"
                                 size="sm"
                                 className="w-full font-bold uppercase text-[11px] py-2 tracking-wider border-rose-500 text-rose-500 hover:bg-rose-500 hover:text-white"
                                 onClick={() => handleAction(req.id, 'rejected')}
                             >
                                 REJECT
-                            </Button>
+                            </button>
                         </div>
                     </div>
                 ))}

@@ -7,6 +7,9 @@ import 'leaflet-routing-machine';
 import { db } from '../config/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 
+// 🔥 TOAST IMPORTS
+import toast, { Toaster } from 'react-hot-toast';
+
 // Marker icon fix for Leaflet
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -74,6 +77,7 @@ const ActiveTrip = ({ rideData, role, onTripEnd }) => {
     const displayName = role === 'driver' ? (rideData.passengerName || "samad") : (rideData.driverName || "Driver");
     const displayPhone = role === 'driver' ? (rideData.passengerPhone || "03114646864") : (rideData.driverPhone || "N/A");
 
+    // 🔥 UPDATED: CANCEL RIDE WITH TOAST
     const handleCancelRide = async () => {
         if (window.confirm("Bhai, kya waqai ride cancel karni hai?")) {
             try {
@@ -82,14 +86,23 @@ const ActiveTrip = ({ rideData, role, onTripEnd }) => {
                     status: 'cancelled',
                     endTime: new Date()
                 });
-                alert("Ride Cancel ho gayi hai.");
+                
+                // Native alert removed -> Custom Toast added
+                toast.success("Ride Cancel ho gayi hai. 🛑", {
+                    style: { background: '#141414', color: '#ff4b4b', border: '1px solid #333' }
+                });
+
                 if (onTripEnd) onTripEnd();
             } catch (error) {
                 console.error("Cancel error:", error);
+                toast.error("Error cancelling ride", {
+                    style: { background: '#141414', color: '#ff4b4b', border: '1px solid #333' }
+                });
             }
         }
     };
 
+    // 🔥 UPDATED: COMPLETE TRIP WITH TOAST
     const handleCompleteTrip = async () => {
         if (window.confirm("Trip complete ho gayi?")) {
             try {
@@ -98,10 +111,18 @@ const ActiveTrip = ({ rideData, role, onTripEnd }) => {
                     status: 'completed',
                     completedAt: new Date()
                 });
-                alert("Trip Completed! Shabaash 🚀");
+                
+                // Native alert removed -> Custom Toast added
+                toast.success("Trip Completed! Shabaash 🚀", {
+                    style: { background: '#141414', color: '#9dff50', border: '1px solid #333' }
+                });
+
                 if (onTripEnd) onTripEnd();
             } catch (error) {
                 console.error("Complete error:", error);
+                toast.error("Error completing ride", {
+                    style: { background: '#141414', color: '#ff4b4b', border: '1px solid #333' }
+                });
             }
         }
     };
@@ -111,6 +132,9 @@ const ActiveTrip = ({ rideData, role, onTripEnd }) => {
 
     return (
         <div className="w-full min-h-screen bg-[#050505] text-white p-4 font-sans selection:bg-[#9dff50]/30">
+            {/* 🔥 TOASTER LAYER REGISTERED */}
+            <Toaster position="top-right" reverseOrder={false} />
+
             <div className="max-w-[1400px] mx-auto h-[88vh] flex items-center justify-center">
                 
                 {/* Fixed Clean Grid Box System */}

@@ -18,10 +18,7 @@ const Loginform = ({ loginUser }) => {
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), url('https://static.vecteezy.com/system/resources/thumbnails/053/733/164/small/perfect-close-up-of-a-modern-car-showcasing-its-intricate-design-photo.jpg')`
       }}
     >
-      {/* CARD RESPONSIVENESS: 
-        - Desktop par: width 100%, max-width 400px, premium glassmorphism glass effect aur borders.
-        - Mobile (xs/max-width: 480px) par: background transparent, no blur, no borders, aur clean mobile spacing jaisa aapki media query mein tha.
-      */}
+      {/* CARD RESPONSIVENESS */}
       <div className="w-full max-w-[400px] bg-white/[0.03] backdrop-blur-[15px] p-[40px_30px] !rounded-2xl border border-gray shadow-[0_20px_40px_rgba(0,0,0,0.4)] text-left xs:bg-transparent xs:border-none xs:backdrop-blur-none xs:p-[30px_20px]">
         
         {/* Header Section */}
@@ -65,7 +62,7 @@ const Loginform = ({ loginUser }) => {
             <div className="text-right mt-2.5 mr-1">
               <Link 
                 to="/forgot-password" 
-                className="text-white font-bold !no-underline ml-1.5 !hover:underline"
+                className="text-white font-bold !no-underline ml-1.5 hover:underline"
               >
                 Forgot?
               </Link>
@@ -84,7 +81,7 @@ const Loginform = ({ loginUser }) => {
         {/* Footer Section */}
         <div className="text-center mt-[35px] text-[#666666] text-sm">
           New to UniRoute?{" "}
-          <Link to="/signup" className="text-white font-bold !no-underline ml-1.5 !hover:underline">
+          <Link to="/signup" className="text-white font-bold !no-underline ml-1.5 hover:underline">
             Create Account
           </Link>
         </div>

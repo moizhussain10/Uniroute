@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaCar, FaClock, FaUsers, FaTrash, FaMapMarkerAlt, FaRoad } from 'react-icons/fa';
 import { db, auth } from '../config/firebase';
 import { collection, query, where, onSnapshot, deleteDoc, doc, orderBy } from 'firebase/firestore';
-
+import toast, { Toaster } from 'react-hot-toast';
 
 const MyRides = () => {
     const [myRides, setMyRides] = useState([]);
@@ -37,9 +37,13 @@ const MyRides = () => {
         if (window.confirm("Kya aap waqai ye ride delete karna chahte hain?")) {
             try {
                 await deleteDoc(doc(db, "rides", rideId));
-                alert("Ride deleted successfully! 🗑️");
+                toast.success("Ride Deleted Successfully", {
+                    style: { background: '#141414', color: '#02ff17', border: '1px solid #333' }
+                });;
             } catch (error) {
-                alert("Error deleting ride: " + error.message);
+                toast.error("Deleting error", {
+                    style: { background: '#141414', color: '#ff4b4b', border: '1px solid #333' }
+                });
             }
         }
     };
@@ -55,6 +59,8 @@ const MyRides = () => {
         <div className="w-full bg-[#0a0a0a] min-h-screen text-white px-4 md:px-8 py-6">
             <div className="max-w-7xl mx-auto">
                 
+                <Toaster position="top-right" reverseOrder={false} />
+
                 {/* Header Area */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                     <div>

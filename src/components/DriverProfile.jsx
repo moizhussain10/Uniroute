@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaUserCircle, FaCar, FaIdCard, FaEnvelope, FaCalendarAlt, FaStar, FaEdit, FaShieldAlt } from 'react-icons/fa';
 import { auth, db } from '../config/firebase';
 import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
-
+import toast, { Toaster } from 'react-hot-toast';
 const DriverProfile = () => {
     const [userData, setUserData] = useState(null);
     const [rideCount, setRideCount] = useState(0);
@@ -54,7 +54,9 @@ const DriverProfile = () => {
             setUserData({ ...userData, vehicleName: editData.vehicleName, vehicleNumber: editData.vehicleNumber });
             setShowEditModal(false);
         } catch (error) {
-            alert("Update fail: " + error.message);
+            toast.error("Upadte Fail", {
+                style: { background: '#141414', color: '#ff4b4b', border: '1px solid #333' }
+            });
         } finally {
             setIsUpdating(false);
         }
@@ -70,11 +72,13 @@ const DriverProfile = () => {
     return (
         <div className="w-full min-h-screen text-white bg-[#0a0a0a] px-4 md:px-8 py-6">
             <div className="max-w-5xl mx-auto">
-                
+
+                <Toaster position="top-right" reverseOrder={false} />
+
                 {/* --- Profile Header Card --- */}
                 <div className="bg-[#141414]/90 border border-gray-800/60 rounded-3xl overflow-hidden mb-6 shadow-2xl">
                     <div className="h-24 bg-gradient-to-r from-[#0a0a0a] to-[#1a1a1a] border-b border-[#9dff50]/10"></div>
-                    
+
                     <div className="text-center pb-6 pt-2 relative">
                         {/* Avatar Wrapper */}
                         <div className="relative inline-block -mt-16 mb-2">
@@ -85,7 +89,7 @@ const DriverProfile = () => {
                         <h2 className="text-[#9dff50] font-black text-2xl tracking-wide uppercase mt-2">
                             {userData?.name || "Driver Name"}
                         </h2>
-                        
+
                         <div className="flex justify-center items-center mt-2">
                             <span className="bg-[#9dff50]/10 border border-[#9dff50]/30 text-[#9dff50] px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase flex items-center gap-1.5 shadow-sm">
                                 <FaShieldAlt /> Verified Driver
@@ -111,13 +115,13 @@ const DriverProfile = () => {
 
                 {/* --- Two Column Layout --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-                    
+
                     {/* Left Column: Personal Info */}
                     <div className="bg-[#141414]/90 border !border-gray-800/60 rounded-3xl p-5 md:p-6 flex flex-col shadow-xl">
                         <h5 className="text-xs font-bold tracking-[2px] uppercase text-gray-500 mb-4 flex items-center gap-2">
                             <FaIdCard className="text-[#9dff50]" /> Information
                         </h5>
-                        
+
                         <div className="space-y-3 flex-1 flex flex-col justify-center">
                             <div className="flex items-center bg-black/30 border !border-gray/700 p-4 rounded-xl gap-4">
                                 <FaEnvelope className="text-[#9dff50] text-lg flex-shrink-0" />
@@ -126,7 +130,7 @@ const DriverProfile = () => {
                                     <h6 className="text-white text-[14px] font-medium truncate">{auth.currentUser?.email}</h6>
                                 </div>
                             </div>
-                            
+
                             <div className="flex items-center bg-black/30 border !border-gray/700 p-4 rounded-xl gap-4">
                                 <FaCalendarAlt className="text-[#9dff50] text-lg flex-shrink-0" />
                                 <div className="min-w-0">
@@ -134,7 +138,7 @@ const DriverProfile = () => {
                                     <h6 className="text-white text-[14px] font-medium truncate">{userData?.phone || "Not Added"}</h6>
                                 </div>
                             </div>
-                            
+
                             <div className="flex items-center bg-black/30 border !border-gray/700 p-4 rounded-xl gap-4">
                                 <FaCalendarAlt className="text-[#9dff50] text-lg flex-shrink-0" />
                                 <div className="min-w-0">
@@ -150,7 +154,7 @@ const DriverProfile = () => {
                         <h5 className="text-xs font-bold tracking-[2px] uppercase text-gray-500 mb-4 flex items-center gap-2">
                             <FaCar className="text-[#9dff50]" /> Primary Vehicle
                         </h5>
-                        
+
                         <div className="bg-[#9dff50]/[0.03] border border-dashed border-[#9dff50]/20 rounded-2xl p-6 text-center relative flex flex-col justify-center items-center flex-1 mb-4">
                             <div className="absolute top-3 right-4 text-[9px] font-black bg-[#9dff50] text-black px-2 py-0.5 rounded uppercase tracking-wide">
                                 Active
@@ -160,7 +164,7 @@ const DriverProfile = () => {
                             <p className="text-[#9dff50]/70 font-mono tracking-widest text-xs mt-0.5 uppercase">{userData?.vehicleNumber || "KAE-XXXX"}</p>
                         </div>
 
-                        <button 
+                        <button
                             className="w-full bg-transparent border border-[#9dff50] text-[#9dff50] font-bold text-sm py-3 px-4 rounded-xl transition-all duration-200 hover:bg-[#9dff50]/10 hover:-translate-y-0.5 flex items-center justify-center gap-2"
                             onClick={() => setShowEditModal(true)}
                         >
@@ -183,11 +187,11 @@ const DriverProfile = () => {
             {showEditModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
                     <div className="bg-[#0a0a0a] border border-[#9dff50]/30 max-w-md w-full rounded-2xl overflow-hidden shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-200">
-                        
+
                         {/* Modal Header */}
                         <div className="flex justify-between items-center mb-5">
                             <h3 className="font-bold text-[#9dff50] text-lg tracking-wide">Update Vehicle</h3>
-                            <button 
+                            <button
                                 className="text-gray-400 hover:text-white transition-colors text-lg font-mono p-1"
                                 onClick={() => setShowEditModal(false)}
                             >
@@ -199,7 +203,7 @@ const DriverProfile = () => {
                         <form onSubmit={handleUpdate} className="space-y-4">
                             <div>
                                 <label className="text-[#9dff50] text-[10px] font-black tracking-wider uppercase block mb-2">Vehicle Name</label>
-                                <input 
+                                <input
                                     type="text"
                                     className="w-full bg-[#111] border border-gray-800 text-white rounded-xl p-3 text-sm focus:outline-none focus:border-[#9dff50] focus:ring-1 focus:ring-[#9dff50]/20 transition-all"
                                     value={editData.vehicleName}
@@ -210,7 +214,7 @@ const DriverProfile = () => {
 
                             <div>
                                 <label className="text-[#9dff50] text-[10px] font-black tracking-wider uppercase block mb-2">Number Plate</label>
-                                <input 
+                                <input
                                     type="text"
                                     className="w-full bg-[#111] border border-gray-800 text-white rounded-xl p-3 text-sm focus:outline-none focus:border-[#9dff50] focus:ring-1 focus:ring-[#9dff50]/20 transition-all"
                                     value={editData.vehicleNumber}
@@ -219,8 +223,8 @@ const DriverProfile = () => {
                                 />
                             </div>
 
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 className="w-full bg-[#9dff50] text-black font-black text-sm tracking-wider py-3.5 rounded-xl transition-all duration-200 hover:bg-[#8ce644] active:scale-[0.99] flex justify-center items-center h-12 mt-6 shadow-md shadow-[#9dff50]/10"
                                 disabled={isUpdating}
                             >

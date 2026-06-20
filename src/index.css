@@ -32,8 +32,6 @@
     min-height: 100vh;
     background: #000000;
     padding: 20px !important;
-    
-    /* 🌟 Sabse Main Fix: Desktop par content sidebar ke BAAD shuru hoga */
     margin-left: 260px !important; 
     transition: margin-left 0.3s ease;
 }
